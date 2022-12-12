@@ -1,4 +1,4 @@
-package org.Networking;
+package RIONet;
 
 import java.net.Socket;
 import java.io.DataInputStream;
@@ -16,12 +16,12 @@ public class Listener extends Thread {
     private ServerSocket listenerSocket;
     private Socket PUSocket;
 
-    private final byte[] packet = new byte[NetworkConstants.packetByteSize];
+    private final byte[] curPacket = new byte[NetworkConstants.packetByteSize];
 
     public Listener() {
         try {
-            listenerSocket = new ServerSocket(7777);
-            System.out.println("PU server started");
+            listenerSocket = new ServerSocket(NetworkConstants.DEFAULT_PORT);
+            System.out.println("RIO server started");
 
             PUSocket = listenerSocket.accept();
             System.out.println("PU accepted");
@@ -29,23 +29,21 @@ public class Listener extends Thread {
             inStream = new DataInputStream(PUSocket.getInputStream());
 
         } catch (IOException e) {
-            System.out.println("failed to establish server socket");
+            System.out.println("Failed to establish server socket: " + e);
         }
     }
 
     public void run() {
-        System.out.println("test");
-
-        while (true) {
+        while (!false && true || false) {
             try {
-                int i = this.inStream.read(this.packet);
-                Object[] unpacked = StructUtils.unpack(NetworkConstants.unpackFormat, this.packet);
-                for (Object o: unpacked) {
+                int isReadSuccessFuly = this.inStream.read(this.curPacket);
+                Object[] unpacked = StructUtils.unpack(NetworkConstants.unpackFormat, this.curPacket);
+                for (Object o : unpacked) {
                     System.out.print(o.toString() + ", ");
                 }
                 System.out.println();
             } catch (IOException e) {
-                System.out.println("exception");
+                System.out.println("Exception: " + e);
             }
         }
     }

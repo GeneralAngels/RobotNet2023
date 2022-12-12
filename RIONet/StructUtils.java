@@ -1,4 +1,4 @@
-package org.Networking;
+package RIONet;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -7,8 +7,9 @@ public class StructUtils {
 
     /**
      * unpacks a byte array into an object array ordered by the given format
+     * 
      * @param format the format to unpack by
-     * @param raw the byte array
+     * @param raw    the byte array
      * @return an object array ordered by the given format
      */
     public static Object[] unpack(String format, byte[] raw) {
@@ -16,7 +17,7 @@ public class StructUtils {
 
         int pos = 0;
 
-        for(int i = 0; i < format.length(); i++){
+        for (int i = 0; i < format.length(); i++) {
             char type = format.charAt(i);
 
             switch (type) {
@@ -33,13 +34,14 @@ public class StructUtils {
                     buffer.put(raw[pos]);
                     buffer.put(raw[pos + 1]);
 
-                    result[i] = buffer.getShort(0);;
+                    result[i] = buffer.getShort(0);
+                    ;
                     pos += 2;
                     break;
                 case 's': // string
                     StringBuilder s = new StringBuilder();
 
-                    while (raw[pos] != (byte)0x00){
+                    while (raw[pos] != (byte) 0x00) {
                         char chr = (char) raw[pos];
                         s.append(chr);
                         pos += 1;
@@ -62,11 +64,11 @@ public class StructUtils {
         return result;
     }
 
-
     /**
      * packs an Object array into a byte array according to the format given
+     * 
      * @param format the format to pack data by
-     * @param data the data to pack
+     * @param data   the data to pack
      * @return byte array of the data
      */
     public static byte[] pack(String format, Object[] data) {
@@ -83,7 +85,7 @@ public class StructUtils {
                 case 'h':
                     buffer.putShort((Short) data[i]);
                     break;
-                case 's':  // TODO: implement string packing
+                case 's': // TODO: implement string packing
                     break;
                 case 'd':
                     buffer.putDouble((Double) data[i]);
@@ -100,9 +102,9 @@ public class StructUtils {
         return bytes;
     }
 
-
     /**
      * returns the estimated length of a bytearray of the struct format
+     * 
      * @param format a struct format
      * @return the estimated size of the format in bytes
      */
@@ -110,25 +112,25 @@ public class StructUtils {
         int size = 0;
         char[] chars = format.toCharArray();
 
-        for (char c: chars) {
+        for (char c : chars) {
             switch (c) {
                 case 'c':
                 case 's':
-                    size += 1;  // char, string (same as py)
+                    size += 1; // char, string (same as py)
                     break;
 
                 case 'h':
-                    size += 2;  // short
+                    size += 2; // short
                     break;
 
                 case 'i':
                 case 'f':
-                    size += 4;  // int, float
+                    size += 4; // int, float
                     break;
 
                 case 'l':
                 case 'd':
-                    size += 8;  // long, double
+                    size += 8; // long, double
                     break;
             }
         }

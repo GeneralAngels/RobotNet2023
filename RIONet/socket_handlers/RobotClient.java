@@ -17,6 +17,7 @@ import RIONet.data_objects.ExampleTask;
 public class RobotClient {
     private Socket sock;
     private DataOutputStream outStream;
+    private DataInputStream inStream;
 
     private byte[] currPacket;
 
@@ -26,17 +27,14 @@ public class RobotClient {
 
     public void connect(String ip, int port) throws IOException {
         sock = new Socket(ip, port);
-        DataOutputStream outStream = new DataOutputStream(sock.getOutputStream());
+        outStream = new DataOutputStream(sock.getOutputStream());
+        inStream = new DataInputStream(sock.getInputStream());
     }
 
     public DataObject getData(DataObjects type) throws IOException {  // TODO: fix the DataObject architecture
         currPacket = new byte[StructUtils.sizeOf(Formats.EXAMPLETASK)];
-        int isReadSuccessFuly = outStream.read(this.currPacket);
-        Object[] unpacked = StructUtils.unpack(NetworkConstants.unpackFormat, this.curPacket);
-        for (Object o : unpacked) {
-            System.out.print(o.toString() + ", ");
-        }
-        System.out.println();
-        return new ExampleTask(0, 0);
+        int isReadSuccessFuly = inStream.read(currPacket);
+        Object[] unpacked = StructUtils.unpack(NetworkConstants.unpackFormat, this.currPacket);
+        return new ExampleTask((int)unpacked[0], (int)unpacked[1]);
     }
 }

@@ -1,14 +1,11 @@
 package RIONet;
 
 import java.net.Socket;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.ServerSocket;
 
-import org.Networking.Constants.NetworkConstants;
-
-import org.Networking.StructUtils;
+import RIONet.Constants.NetworkConstants;
+import RIONet.socket_utils.StructUtils;
 
 public class Sendnudes extends Thread {
 

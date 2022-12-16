@@ -1,13 +1,16 @@
-package RIONet;
+package RIONet.socket_utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import RIONet.data_objects.DataObject;
+import RIONet.data_objects.DataObjects;
 
 public class StructUtils {
 
     /**
      * unpacks a byte array into an object array ordered by the given format
-     * 
+     *
      * @param format the format to unpack by
      * @param raw    the byte array
      * @return an object array ordered by the given format
@@ -35,7 +38,6 @@ public class StructUtils {
                     buffer.put(raw[pos + 1]);
 
                     result[i] = buffer.getShort(0);
-                    ;
                     pos += 2;
                     break;
                 case 's': // string
@@ -66,13 +68,13 @@ public class StructUtils {
 
     /**
      * packs an Object array into a byte array according to the format given
-     * 
+     *
      * @param format the format to pack data by
      * @param data   the data to pack
      * @return byte array of the data
      */
     public static byte[] pack(String format, Object[] data) {
-        int size = structSize(format);
+        int size = sizeOf(format);
 
         byte[] bytes = new byte[size];
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
@@ -104,11 +106,11 @@ public class StructUtils {
 
     /**
      * returns the estimated length of a bytearray of the struct format
-     * 
+     *
      * @param format a struct format
      * @return the estimated size of the format in bytes
      */
-    public static int structSize(String format) {
+    public static int sizeOf(String format) {
         int size = 0;
         char[] chars = format.toCharArray();
 
@@ -135,5 +137,15 @@ public class StructUtils {
             }
         }
         return size;
+    }
+
+    public static String formatOf(DataObjects o) {
+        switch (o) {
+            case ExampleTask:
+                return "hh";
+
+            default:
+                return null;
+        }
     }
 }

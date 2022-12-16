@@ -5,9 +5,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import org.Networking.Constants.NetworkConstants;
-
-import org.Networking.StructUtils;
+import RIONet.Constants.NetworkConstants;
+import RIONet.socket_utils.StructUtils;
 
 /** Add your docs here. */
 public class Listener extends Thread {

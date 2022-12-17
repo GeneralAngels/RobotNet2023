@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import RIONet.Constants.NetworkConstants;
 import RIONet.socket_utils.StructUtils;
 
+
 /** Add your docs here. */
 public class Listener extends Thread {
 
@@ -33,9 +34,9 @@ public class Listener extends Thread {
     }
 
     public void run() {
-        while (!false && true || false) {
+        while (true) {
             try {
-                int isReadSuccessFuly = this.inStream.read(this.curPacket);
+                inStream.read(this.curPacket);
                 Object[] unpacked = StructUtils.unpack(NetworkConstants.unpackFormat, this.curPacket);
                 for (Object o : unpacked) {
                     System.out.print(o.toString() + ", ");

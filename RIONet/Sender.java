@@ -5,14 +5,13 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 import RIONet.Constants.NetworkConstants;
-import RIONet.socket_utils.StructUtils;
 
-public class Sendnudes extends Thread {
+public class Sender extends Thread {
 
     private DataOutputStream outStream;
     private Socket sendnudesSocket;
 
-    public Sendnudes() {
+    public Sender() {
         try {
             sendnudesSocket = new Socket(NetworkConstants.PUip, NetworkConstants.DEFAULT_PORT);
             System.out.println("Client connected to PU.");

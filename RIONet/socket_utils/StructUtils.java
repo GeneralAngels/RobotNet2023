@@ -3,9 +3,6 @@ package RIONet.socket_utils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import RIONet.data_objects.DataObject;
-import RIONet.data_objects.DataObjects;
-
 public class StructUtils {
 
     /**
@@ -78,6 +75,7 @@ public class StructUtils {
 
         byte[] bytes = new byte[size];
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        buffer.order(ByteOrder.BIG_ENDIAN);
 
         for (int i = 0; i < format.length(); i++) {
             switch (format.charAt(i)) {
@@ -137,15 +135,5 @@ public class StructUtils {
             }
         }
         return size;
-    }
-
-    public static String formatOf(DataObjects o) {
-        switch (o) {
-            case ExampleTask:
-                return "hh";
-
-            default:
-                return null;
-        }
     }
 }

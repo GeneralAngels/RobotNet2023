@@ -4,18 +4,18 @@ import java.net.Socket;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
-import RIONet.data_objects.Task;
+import RIONet.data_objects.DataObject;
 
 
-public class RecieverSocket {
+public class ListenerSocket {
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
     private DataInputStream inStream;
 
-    private byte[] currPacket = new byte[Task.size];
+    private byte[] currPacket;
 
-    public RecieverSocket(int port) { // should also accept a DataObject in constructor?
+    public ListenerSocket(int port) { // should also accept a DataObject in constructor?
 
         try {
             serverSocket = new ServerSocket(port);
@@ -33,10 +33,10 @@ public class RecieverSocket {
         }
     }
 
-    public Task getTask() throws IOException {
+    public T getTask() throws IOException {
         if (inStream != null) {
             inStream.read(currPacket);
-            return Task.deserealize(currPacket);
+            return (T)T.deserialize(currPacket);
         } else { // TODO: throw an exception
             System.out.println("Must first astablish a connection to sender before recieving data");
             return null;

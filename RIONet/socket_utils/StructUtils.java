@@ -3,7 +3,7 @@ package RIONet.socket_utils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class StructUtils {
+public class StructUtils { //TODO: add numbers utility to pack/unpack
 
     /**
      * unpacks a byte array into an object array ordered by the given format

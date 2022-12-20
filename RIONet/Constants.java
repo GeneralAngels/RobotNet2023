@@ -1,14 +1,17 @@
 package RIONet;
 
+import java.util.HashMap;
+
+import RIONet.data_objects.DataHeader;
+
 public final class Constants {
     public static final class NetworkConstants {
         public final static int DEFAULT_PORT = 2230;
         public final static String PUip = "10.22.30.157"; // TODO update ip.
-        public final static int packetByteSize = 6; // TODO: when done with RobotClient/server, remove
-        public final static String unpackFormat = "hhhhh";
 
-        public static final class HeaderPacketSizes {
-            public final static int MOTOR_BY_PRECENT = 2; // id
-        }
+        // TODO: put in config file
+        public static final HashMap<DataHeader, Integer> HeaderPacketSizes = new HashMap<DataHeader, Integer>() {{
+            put(DataHeader.EXAMPLE_HEADER, 2);
+        }};
     }
 }

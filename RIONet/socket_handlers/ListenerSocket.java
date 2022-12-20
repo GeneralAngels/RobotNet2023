@@ -10,7 +10,6 @@ import RIONet.data_objects.DataObject;
 
 import RIONet.Constants.NetworkConstants;
 
-
 public class ListenerSocket {
 
     private ServerSocket serverSocket;
@@ -35,19 +34,18 @@ public class ListenerSocket {
         }
     }
 
-    public DataObject getData() {
+    public DataObject getData() { // TODO: use DataObject serialize()
         if (inStream != null) {
             try {
                 DataHeader header = DataHeader.values()[inStream.readShort()];
                 int bodyLength = NetworkConstants.HeaderPacketSizes.get(header);
                 int[] body = new int[bodyLength];
                 for (int i = 0; i < bodyLength; i++) {
-                    body[i] = (int)inStream.readInt();
+                    body[i] = (int) inStream.readInt();
                 }
-    
+
                 return new DataObject(header, body);
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println("An error has accured while reading data: " + e);
                 return null;
             }

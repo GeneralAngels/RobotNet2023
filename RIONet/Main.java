@@ -3,6 +3,7 @@ package RIONet;
 import java.io.IOException;
 
 import RIONet.Constants.NetworkConstants;
+import RIONet.data_objects.DataHeader;
 import RIONet.data_objects.DataObject;
 import RIONet.thread_handlers.ListenerThread;
 
@@ -19,7 +20,8 @@ public class Main {
 
                 while (true) {
                         DataObject data = listenerThread.getData();
-
+                        
+                        DataHeader header = data.getHeader();
                         if (data != null) {
                                 for (int value : data.getValues()) {
                                         System.out.print(value + ", ");

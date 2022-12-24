@@ -10,18 +10,20 @@ import RIONet.data_objects.DataObject;
 /** Add your docs here. */
 public class ListenerThread extends Thread {
 
-    private Queue<DataObject> taskQueue;
+    private Queue<DataObject> dataQueue;
     private ListenerSocket listenerSocket;
 
     public ListenerThread(int port) throws IOException {
-        taskQueue = new LinkedList<DataObject>();
+        dataQueue = new LinkedList<DataObject>();
         listenerSocket = new ListenerSocket(port);
+
+        listenerSocket.accept();
     }
 
     public void run() {
         while (true) {
             try {
-                taskQueue.add(listenerSocket.getData());
+                dataQueue.add(listenerSocket.getData());
             } catch (IOException e) {
                 System.out.println("An error accured while recieving data from sender: " + e);
             }
@@ -35,6 +37,6 @@ public class ListenerThread extends Thread {
      *         the queue is empty
      */
     public DataObject getData() {
-        return taskQueue.poll();
+        return dataQueue.poll();
     }
 }

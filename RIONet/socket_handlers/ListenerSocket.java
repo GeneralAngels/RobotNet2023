@@ -33,7 +33,7 @@ public class ListenerSocket { // TODO implement multiple clients connection
      * @return DataObject the wrapped packet
      */
     public DataObject getData() throws IOException {
-        if (inStream != null) {
+        if (clientSocket != null) {
             DataHeader header = DataHeader.values()[inStream.readShort()];
             int bodyLength = NetworkConstants.HeaderPacketSizes.get(header);
             int[] body = new int[bodyLength];

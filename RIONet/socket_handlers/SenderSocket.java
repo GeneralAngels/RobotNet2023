@@ -21,15 +21,10 @@ public class SenderSocket {
      * @param port the port of the listener to connect to
      * @return boolean whether the connection was succesful
      */
-    public boolean connect(String ip, int port) {
-        try {
-            sock = new Socket(ip, port);
-            outStream = new DataOutputStream(sock.getOutputStream());
-            return true;
-        } catch (IOException e) {
-            System.out.println("Failed to connect to listener:  " + e);
-            return false;
-        }
+    public boolean connect(String ip, int port) throws IOException {
+        sock = new Socket(ip, port);
+        outStream = new DataOutputStream(sock.getOutputStream());
+        return true;
     }
 
     /**
@@ -38,18 +33,11 @@ public class SenderSocket {
      * @param data DataObject the data to send
      * @return boolean whether the data was sent
      */
-    public boolean sendData(DataObject data) {
+    public void sendData(DataObject data) throws IOException {
         if (outStream != null) {
-            try {
-                outStream.write(data.serialize());
-                return true;
-            } catch (IOException e) {
-                System.out.println("An error has accured while sending data: " + e);
-            }
+            outStream.write(data.serialize());
         } else { // TODO: throw an exception
             System.out.println("Must first astablish a connection to listener before sending");
         }
-        return false;
-
     }
 }

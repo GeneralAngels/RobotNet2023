@@ -1,5 +1,6 @@
 package RIONet.thread_handlers;
 
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -12,14 +13,18 @@ public class ListenerThread extends Thread {
     private Queue<DataObject> taskQueue;
     private ListenerSocket listenerSocket;
 
-    public ListenerThread(int port) {
+    public ListenerThread(int port) throws IOException {
         taskQueue = new LinkedList<DataObject>();
         listenerSocket = new ListenerSocket(port);
     }
 
     public void run() {
         while (true) {
-            taskQueue.add(listenerSocket.getData());
+            try {
+                taskQueue.add(listenerSocket.getData());
+            } catch (IOException e) {
+                System.out.println("An error accured while recieving data from sender: " + e);
+            }
         }
     }
 

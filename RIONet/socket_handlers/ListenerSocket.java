@@ -15,24 +15,16 @@ public class ListenerSocket {
     private Socket clientSocket;
     private DataInputStream inStream;
 
-    public ListenerSocket(int port) {
-        try {
-            serverSocket = new ServerSocket(port);
-        } catch (IOException e) {
-            System.out.println("Failed to establish server socket: " + e);
-        }
+    public ListenerSocket(int port) throws IOException {
+        serverSocket = new ServerSocket(port);
     }
 
     /**
      * accepts a sender connection
      */
-    public void accept() {
-        try {
-            clientSocket = serverSocket.accept();
-            inStream = new DataInputStream(clientSocket.getInputStream());
-        } catch (Exception e) {
-            System.out.println("Failed to accept a client: " + e);
-        }
+    public void accept() throws IOException {
+        clientSocket = serverSocket.accept();
+        inStream = new DataInputStream(clientSocket.getInputStream());
     }
 
     /**
@@ -40,21 +32,16 @@ public class ListenerSocket {
      * 
      * @return DataObject the wrapped packet
      */
-    public DataObject getData() {
+    public DataObject getData() throws IOException {
         if (inStream != null) {
-            try {
-                DataHeader header = DataHeader.values()[inStream.readShort()];
-                int bodyLength = NetworkConstants.HeaderPacketSizes.get(header);
-                int[] body = new int[bodyLength];
-                for (int i = 0; i < bodyLength; i++) {
-                    body[i] = (int) inStream.readInt();
-                }
- 
-                return new DataObject(header, body);
-            } catch (IOException e) {
-                System.out.println("An error has accured while reading data: " + e);
-                return null;
+            DataHeader header = DataHeader.values()[inStream.readShort()];
+            int bodyLength = NetworkConstants.HeaderPacketSizes.get(header);
+            int[] body = new int[bodyLength];
+            for (int i = 0; i < bodyLength; i++) {
+                body[i] = (int) inStream.readInt();
             }
+
+            return new DataObject(header, body);
         } else { // TODO: throw an exception 
             System.out.println("Must first astablish a connection to sender before recieving data");
             return null;

@@ -7,7 +7,6 @@ import java.net.ServerSocket;
 
 import RIONet.data_objects.DataHeader;
 import RIONet.data_objects.DataObject;
-
 import RIONet.Constants.NetworkConstants;
 
 public class ListenerSocket {
@@ -17,7 +16,6 @@ public class ListenerSocket {
     private DataInputStream inStream;
 
     public ListenerSocket(int port) {
-
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
@@ -25,6 +23,9 @@ public class ListenerSocket {
         }
     }
 
+    /**
+     * accepts a sender connection
+     */
     public void accept() {
         try {
             clientSocket = serverSocket.accept();
@@ -34,7 +35,12 @@ public class ListenerSocket {
         }
     }
 
-    public DataObject getData() { // TODO: use DataObject serialize()
+    /**
+     * recieve a packet from senders wrapped around a DataObject
+     * 
+     * @return DataObject the wrapped packet
+     */
+    public DataObject getData() {
         if (inStream != null) {
             try {
                 DataHeader header = DataHeader.values()[inStream.readShort()];
@@ -43,13 +49,13 @@ public class ListenerSocket {
                 for (int i = 0; i < bodyLength; i++) {
                     body[i] = (int) inStream.readInt();
                 }
-
+ 
                 return new DataObject(header, body);
             } catch (IOException e) {
                 System.out.println("An error has accured while reading data: " + e);
                 return null;
             }
-        } else { // TODO: throw an exception
+        } else { // TODO: throw an exception 
             System.out.println("Must first astablish a connection to sender before recieving data");
             return null;
         }

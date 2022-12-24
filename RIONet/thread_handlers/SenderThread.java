@@ -30,6 +30,11 @@ public class SenderThread extends Thread {
         }
     }
 
+    /**
+     * adds data to be sent to the listener
+     * 
+     * @param data DataObject the data to add to the data output queue
+     */
     public void putData(DataObject data) {
         dataOutputQueue.add(data);
     }

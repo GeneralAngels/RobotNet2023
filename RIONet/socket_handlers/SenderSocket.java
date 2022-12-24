@@ -14,6 +14,13 @@ public class SenderSocket {
     public SenderSocket() {
     }
 
+    /**
+     * connects the sender to a listener on the given ip and port
+     * 
+     * @param ip   the ip of the listener to connect to
+     * @param port the port of the listener to connect to
+     * @return boolean whether the connection was succesful
+     */
     public boolean connect(String ip, int port) {
         try {
             sock = new Socket(ip, port);
@@ -25,13 +32,18 @@ public class SenderSocket {
         }
     }
 
+    /**
+     * sends data to the listener, the data must be wrapped around a DataObject
+     * 
+     * @param data DataObject the data to send
+     * @return boolean whether the data was sent
+     */
     public boolean sendData(DataObject data) {
         if (outStream != null) {
             try {
                 outStream.write(data.serialize());
                 return true;
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 System.out.println("An error has accured while sending data: " + e);
             }
         } else { // TODO: throw an exception

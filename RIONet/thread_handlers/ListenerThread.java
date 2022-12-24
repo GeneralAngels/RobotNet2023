@@ -23,6 +23,12 @@ public class ListenerThread extends Thread {
         }
     }
 
+    /**
+     * get the next DataObject from the recieved task queue
+     * 
+     * @return DataObject a DataObject from the threads tasks queue, returns null if
+     *         the queue is empty
+     */
     public DataObject getData() {
         return taskQueue.poll();
     }

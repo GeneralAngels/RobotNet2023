@@ -9,7 +9,7 @@ import RIONet.data_objects.DataHeader;
 import RIONet.data_objects.DataObject;
 import RIONet.Constants.NetworkConstants;
 
-public class ListenerSocket {
+public class ListenerSocket { // TODO implement multiple clients connection
 
     private ServerSocket serverSocket;
     private Socket clientSocket;
@@ -42,7 +42,7 @@ public class ListenerSocket {
             }
 
             return new DataObject(header, body);
-        } else { // TODO: throw an exception 
+        } else { // TODO: throw an exception
             System.out.println("Must first astablish a connection to sender before recieving data");
             return null;
         }

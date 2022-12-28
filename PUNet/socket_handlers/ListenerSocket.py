@@ -4,6 +4,7 @@ import struct
 from ..data_objects.DataHeader import DataHeader
 from ..data_objects.DataObject import DataObject
 from ..Constants import NetworkConstants
+from .SockethandlerException import SockethandlerException
 
 
 class ListenerSocket:
@@ -39,7 +40,8 @@ class ListenerSocket:
         the packet will be wrapped around a DataObject.
         If there isnt an available packet on buffer it will wait for one.
 
-        :raises Exception: if the listener didn't accept any clients,
+        :raises SockethandlerException:
+        if the listener didn't accept any clients,
         it will raise an Exception
         :return: a single packet sent
         :rtype: DataObject
@@ -57,5 +59,8 @@ class ListenerSocket:
             )
 
             return DataObject(header, body)
-        else:  # TODO imlement custom exception
-            raise Exception
+        else:
+            raise SockethandlerException(
+                "Must first astablish a connection \
+                to sender before recieving data!"
+            )

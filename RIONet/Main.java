@@ -7,6 +7,7 @@ import RIONet.Constants.NetworkConstants;
 import RIONet.data_objects.DataHeader;
 import RIONet.data_objects.DataObject;
 import RIONet.socket_handlers.SenderSocket;
+import RIONet.socket_handlers.SocketHandlerException;
 import RIONet.thread_handlers.ListenerThread;
 
 public class Main {
@@ -35,6 +36,8 @@ public class Main {
                                 System.out.println(newPack.toString());
                         } catch (IOException e) {
                                 System.out.println("faied to send packet to listener: " + e);
+                        } catch (SocketHandlerException e) {
+                                System.out.println(e);
                         }
 
                         try {

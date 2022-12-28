@@ -32,19 +32,17 @@ public class ListenerSocket { // TODO implement multiple clients connection
      * 
      * @return DataObject the wrapped packet
      */
-    public DataObject getData() throws IOException {
-        if (clientSocket != null) {
-            DataHeader header = DataHeader.values()[inStream.readShort()];
-            int bodyLength = NetworkConstants.HeaderPacketSizes.get(header);
-            int[] body = new int[bodyLength];
-            for (int i = 0; i < bodyLength; i++) {
-                body[i] = (int) inStream.readInt();
-            }
-            System.out.println(header.name());
-            return new DataObject(header, body);
-        } else { // TODO: throw an exception
-            System.out.println("Must first astablish a connection to sender before recieving data");
-            return null;
+    public DataObject getData() throws IOException, SocketHandlerException {
+        if (clientSocket == null)
+            throw new SocketHandlerException("Must first astablish a connection to sender before recieving data!");
+
+        DataHeader header = DataHeader.values()[inStream.readShort()];
+        int bodyLength = NetworkConstants.HeaderPacketSizes.get(header);
+        int[] body = new int[bodyLength];
+        for (int i = 0; i < bodyLength; i++) {
+            body[i] = (int) inStream.readInt();
         }
+        System.out.println(header.name());
+        return new DataObject(header, body);
     }
 }

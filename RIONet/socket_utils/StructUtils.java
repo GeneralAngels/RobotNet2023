@@ -3,7 +3,7 @@ package RIONet.socket_utils;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-public class StructUtils { //TODO: add numbers utility to pack/unpack
+public class StructUtils {
 
     /**
      * unpacks a byte array into an object array ordered by the given format
@@ -13,6 +13,7 @@ public class StructUtils { //TODO: add numbers utility to pack/unpack
      * @return an object array ordered by the given format
      */
     public static Object[] unpack(String format, byte[] raw) {
+        format = parseFormat(format);
         Object[] result = new Object[format.length()];
 
         int pos = 0;
@@ -71,6 +72,7 @@ public class StructUtils { //TODO: add numbers utility to pack/unpack
      * @return byte array of the data
      */
     public static byte[] pack(String format, Object[] data) {
+        format = parseFormat(format);
         int size = sizeOf(format);
 
         byte[] bytes = new byte[size];
@@ -109,6 +111,7 @@ public class StructUtils { //TODO: add numbers utility to pack/unpack
      * @return the estimated size of the format in bytes
      */
     public static int sizeOf(String format) {
+        format = parseFormat(format);
         int size = 0;
         char[] chars = format.toCharArray();
 
@@ -135,5 +138,33 @@ public class StructUtils { //TODO: add numbers utility to pack/unpack
             }
         }
         return size;
+    }
+
+    /**
+     * Takes a format with numbers and parses it into one without numbers.
+     * ie: 'i3cd' -> 'icccd'
+     * @param format the unparsed format
+     * @return the parsed format
+     */
+    public static String parseFormat(String format) {
+        String newFormat = "";
+        int multiplier = 0;
+        for (int i = 0; i < format.length(); i++) {
+            char curr = format.charAt(i);
+
+            if (curr == '1' | curr == '2' | curr == '3' | curr == '4' | curr == '5' | curr == '6' | curr == '7' | curr == '8' | curr == '9')
+                multiplier = multiplier * 10 + Character.getNumericValue(curr);
+
+            else {
+                if (multiplier == 0)
+                    newFormat += curr;
+
+                else
+                    newFormat += new String(new char[multiplier]).replace('\0', curr);
+                multiplier = 0;
+            }
+        }
+
+        return newFormat;
     }
 }

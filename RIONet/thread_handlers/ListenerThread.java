@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import RIONet.socket_handlers.ListenerSocket;
+import RIONet.socket_handlers.SocketHandlerException;
 import RIONet.data_objects.DataObject;
 
 /** Add your docs here. */
@@ -27,6 +28,8 @@ public class ListenerThread extends Thread {
                 dataQueue.add(data);
             } catch (IOException e) {
                 System.out.println("An error accured while recieving data from sender: " + e);
+            } catch (SocketHandlerException e) {
+                System.out.println(e);
             }
         }
     }

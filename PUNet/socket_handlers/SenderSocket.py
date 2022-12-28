@@ -1,6 +1,7 @@
 import socket
 
 from ..data_objects.DataObject import DataObject
+from .SockethandlerException import SockethandlerException
 
 
 class SenderSocket:
@@ -29,10 +30,13 @@ class SenderSocket:
 
         :param data: the packet wrapped around a DataObject
         :type data: DataObject
-        :raises Exception: if the sender isn't connected to any listener
+        :raises SockethandlerException:
+        if the sender isn't connected to any listener
         it will raise an Exception
         """
         if self.connected:
             self.sock.send(data.serialize())
         else:
-            raise Exception
+            raise SockethandlerException(
+                "Must first astablish a connection to listener before sending!"
+            )

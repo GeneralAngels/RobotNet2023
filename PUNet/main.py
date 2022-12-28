@@ -1,5 +1,4 @@
 from time import sleep
-import sys
 
 from .socket_handlers.SenderSocket import SenderSocket
 from .thread_handlers.ListenerThread import ListenerThread

@@ -1,6 +1,6 @@
 import socket
 
-from PUNet.data_objects.DataObject import DataObject
+from ..data_objects.DataObject import DataObject
 
 
 class SenderSocket:

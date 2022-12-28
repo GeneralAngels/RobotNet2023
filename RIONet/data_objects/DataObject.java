@@ -1,5 +1,8 @@
 package RIONet.data_objects;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 public class DataObject {
     private DataHeader header;
     private int[] values;
@@ -20,7 +23,7 @@ public class DataObject {
 
     /**
      * get the body of the DataObject
-     * 
+     *
      * @return int[] the body
      */
     public int[] getValues() {
@@ -29,16 +32,36 @@ public class DataObject {
 
     /**
      * serializes the DataObject into an array of bytes
-     * 
+     *
      * @return byte[] the serializd DataObject
      */
     public byte[] serialize() {
-        byte[] serialized = new byte[values.length + 1];
-        serialized[0] = (byte) (short) (header.ordinal());
-        for (int i = 1; i < values.length + 1; i++) {
-            serialized[i] = (byte) values[i - 1];
+        byte[] bytes = new byte[4 * values.length + 2];
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        buffer.order(ByteOrder.BIG_ENDIAN);
+
+        buffer.putShort((short)header.ordinal());
+
+        for (int i = 0; i < values.length; i++) {
+            buffer.putInt(values[i]);
         }
 
-        return serialized;
+        // Retrieve all bytes in the buffer
+        buffer.clear();
+        bytes = new byte[buffer.capacity()];
+
+        // transfer bytes from this buffer into the given destination array
+        buffer.get(bytes, 0, bytes.length);
+        return bytes;
+    }
+
+    @Override
+    public String toString() {
+        String headeString = header.name() + ": ";
+        String bodyString = "";
+        for (int i : values) {
+            bodyString += Integer.toString(i) + ", ";
+        }
+        return headeString + bodyString;
     }
 }

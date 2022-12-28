@@ -23,7 +23,8 @@ public class ListenerThread extends Thread {
     public void run() {
         while (true) {
             try {
-                dataQueue.add(listenerSocket.getData());
+                DataObject data = listenerSocket.getData();
+                dataQueue.add(data);
             } catch (IOException e) {
                 System.out.println("An error accured while recieving data from sender: " + e);
             }

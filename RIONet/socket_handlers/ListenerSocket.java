@@ -40,7 +40,7 @@ public class ListenerSocket { // TODO implement multiple clients connection
             for (int i = 0; i < bodyLength; i++) {
                 body[i] = (int) inStream.readInt();
             }
-
+            System.out.println(header.name());
             return new DataObject(header, body);
         } else { // TODO: throw an exception
             System.out.println("Must first astablish a connection to sender before recieving data");

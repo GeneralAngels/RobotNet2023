@@ -1,7 +1,7 @@
 from typing import List
 import struct
 
-from DataHeader import DataHeader
+from .DataHeader import DataHeader
 
 
 class DataObject:
@@ -17,5 +17,8 @@ class DataObject:
 
     def serialize(self) -> bytes:
         return struct.pack(
-            f"h{len(self.values)}i", self.header.value, *self.values
+            f">h{len(self.values)}i", self.header.value, *self.values
         )
+
+    def __str__(self) -> str:
+        return self.header.name + ': ' + str(self.values)

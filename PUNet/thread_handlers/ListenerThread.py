@@ -7,13 +7,16 @@ from PUNet.data_objects.DataObject import DataObject
 
 
 class ListenerThread(Thread):
-    def __init__(self, port: int) -> None:
-        super().__init__()
-        self.listener_socket: ListenerSocket = ListenerSocket(port)
+    def __init__(self, port: int, local: bool, daemon: bool) -> None:
+        super().__init__(daemon=daemon)
+        self.listener_socket: ListenerSocket = ListenerSocket(port, local)
         self.data_queue: "Queue[DataObject]" = Queue()
 
+        self.running = True
+
     def run(self) -> None:
-        while True:
+        self.listener_socket.accept()
+        while self.running:
             try:
                 self.data_queue.put(self.listener_socket.get_data())
             except socket.error as e:
@@ -21,3 +24,6 @@ class ListenerThread(Thread):
 
     def getData(self) -> DataObject:
         return self.data_queue.get()
+
+    def stop(self) -> None:
+        self.running = False

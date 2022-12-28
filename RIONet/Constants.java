@@ -6,7 +6,7 @@ import RIONet.data_objects.DataHeader;
 
 public final class Constants {
     public static final class NetworkConstants {
-        public final static int DEFAULT_PORT = 2230;
+        public final static int DEFAULT_PORT = 6666;
         public final static String PUip = "10.22.30.157"; // TODO update ip.
 
         // TODO: put in config file

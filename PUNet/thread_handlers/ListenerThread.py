@@ -2,8 +2,8 @@ from threading import Thread
 from queue import Queue
 import socket
 
-from ..socket_handlers.ListenerSocket import ListenerSocket
-from ..data_objects.DataObject import DataObject
+from PUNet.socket_handlers.ListenerSocket import ListenerSocket
+from PUNet.data_objects.DataObject import DataObject
 
 
 class ListenerThread(Thread):

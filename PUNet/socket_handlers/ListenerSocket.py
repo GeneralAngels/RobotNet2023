@@ -1,9 +1,9 @@
 import socket
 import struct
 
-from ..data_objects.DataHeader import DataHeader
-from ..data_objects.DataObject import DataObject
-from ..Constants import NetworkConstants
+from PUNet.data_objects.DataHeader import DataHeader
+from PUNet.data_objects.DataObject import DataObject
+from PUNet.Constants import NetworkConstants
 
 
 class ListenerSocket:

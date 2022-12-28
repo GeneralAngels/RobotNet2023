@@ -23,7 +23,7 @@ def sender():
     sender_sock.connect("127.0.0.1", 6666)
     while True:
         sleep(1)
-        new_pack = DataObject(DataHeader.EXAMPLE, [1, 2])
+        new_pack = DataObject(DataHeader.EXAMPLE, [1], [2.4, 6.7])
         sender_sock.send_data(new_pack)
         print(f'sent data: {str(new_pack)}')
 

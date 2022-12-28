@@ -1,20 +1,21 @@
 package RIONet.data_objects;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import RIONet.socket_utils.StructUtils;
 
 public class DataObject {
     private DataHeader header;
-    private int[] values;
+    private int[] ivalues;
+    private double[] dvalues;
 
-    public DataObject(DataHeader header, int[] values) {
+    public DataObject(DataHeader header, int[] ivalues, double[] dvalues) {
         this.header = header;
-        this.values = values;
+        this.ivalues = ivalues;
+        this.dvalues = dvalues;
     }
 
     /**
      * get the header of the DataObject
-     * 
+     *
      * @return DataHeader the header
      */
     public DataHeader getHeader() {
@@ -22,12 +23,21 @@ public class DataObject {
     }
 
     /**
-     * get the body of the DataObject
+     * get the int part of the DataObject body
      *
      * @return int[] the body
      */
-    public int[] getValues() {
-        return values;
+    public int[] getIValues() {
+        return ivalues;
+    }
+
+    /**
+     * get the double part of the DataObject body
+     *
+     * @return double[] the body
+     */
+    public double[] getDValues() {
+        return dvalues;
     }
 
     /**
@@ -36,31 +46,26 @@ public class DataObject {
      * @return byte[] the serializd DataObject
      */
     public byte[] serialize() {
-        byte[] bytes = new byte[4 * values.length + 2];
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        buffer.order(ByteOrder.BIG_ENDIAN);
-
-        buffer.putShort((short)header.ordinal());
-
-        for (int i = 0; i < values.length; i++) {
-            buffer.putInt(values[i]);
+        String format = String.format("%di%dd", ivalues.length, dvalues.length);
+        Object[] body = new Object[ivalues.length + dvalues.length];
+        for (int i = 0; i < ivalues.length; i++) {
+            body[i] = (Object)ivalues[i];
         }
-
-        // Retrieve all bytes in the buffer
-        buffer.clear();
-        bytes = new byte[buffer.capacity()];
-
-        // transfer bytes from this buffer into the given destination array
-        buffer.get(bytes, 0, bytes.length);
-        return bytes;
+        for (int i = ivalues.length; i < dvalues.length; i++) {
+            body[i] = (Object)dvalues[i];
+        }
+        return StructUtils.pack(format, body);
     }
 
     @Override
     public String toString() {
         String headeString = header.name() + ": ";
         String bodyString = "";
-        for (int i : values) {
+        for (int i : ivalues) {
             bodyString += Integer.toString(i) + ", ";
+        }
+        for (double d : dvalues) {
+            bodyString += Double.toString(d) + ", ";
         }
         return headeString + bodyString;
     }

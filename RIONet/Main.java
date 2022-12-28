@@ -28,8 +28,9 @@ public class Main {
                 }
 
                 while (true) {
-                        int[] body = new int[] {1, 2};
-                        DataObject newPack = new DataObject(DataHeader.EXAMPLE_HEADER, body);
+                        int[] ibody = new int[] {7};
+                        double[] dbody = new double[] {3.5, 6.7};
+                        DataObject newPack = new DataObject(DataHeader.EXAMPLE_HEADER, ibody, dbody);
 
                         try {
                                 senderSocket.sendData(newPack);
@@ -64,13 +65,7 @@ public class Main {
                         DataObject data = listenerThread.getData();
 
                         if (data != null) {
-                                DataHeader header = data.getHeader();
-                                System.out.println(header.name());
-
-                                for (int value : data.getValues()) {
-                                        System.out.print(value + ", ");
-                                }
-                                System.out.println();
+                                System.out.println(data.toString());
                         }
                 }
         }

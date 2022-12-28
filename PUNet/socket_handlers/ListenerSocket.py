@@ -52,13 +52,17 @@ class ListenerSocket:
                 struct.unpack(">h", recieved)[0]
             )
 
-            body_length: int = NetworkConstants.headerPacketSizes[header]
-            recieved = self.client_socket.recv(4*body_length)
-            body = struct.unpack(
-                f">{body_length}i", recieved
+            ibody_length: int = NetworkConstants.headerPacketSizes[header][0]
+            dbody_length: int = NetworkConstants.headerPacketSizes[header][1]
+
+            ibody = struct.unpack(
+                f">{ibody_length}i", self.client_socket.recv(4*ibody_length)
+            )
+            dbody = struct.unpack(
+                f">{dbody_length}d", self.client_socket.recv(8*dbody_length)
             )
 
-            return DataObject(header, body)
+            return DataObject(header, ibody, dbody)
         else:
             raise SockethandlerException(
                 "Must first astablish a connection \

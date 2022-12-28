@@ -7,7 +7,16 @@ from ..Constants import NetworkConstants
 
 
 class ListenerSocket:
+    """A socket handler for listening for data.
+    Implements a server that listens for sender connections.
+    """
     def __init__(self, port: int, local: bool) -> None:
+        """
+        :param port: the port to listen on
+        :type port: int
+        :param local: whether to run the server on localhost
+        :type local: bool
+        """
         self.server_socket: socket.socket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM
         )
@@ -20,10 +29,21 @@ class ListenerSocket:
             self.server_socket.bind((socket.gethostname(), port))
 
     def accept(self) -> None:
+        """Accepts a single sender connection to recieve data from
+        """
         self.server_socket.listen(1)
         self.client_socket, addr = self.server_socket.accept()
 
     def get_data(self) -> DataObject:
+        """Gets a single packet sent from a sender.
+        the packet will be wrapped around a DataObject.
+        If there isnt an available packet on buffer it will wait for one.
+
+        :raises Exception: if the listener didn't accept any clients,
+        it will raise an Exception
+        :return: a single packet sent
+        :rtype: DataObject
+        """
         if self.client_socket is not None:
             recieved = self.client_socket.recv(2)
             header: DataHeader = DataHeader(

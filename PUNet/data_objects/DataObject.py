@@ -5,7 +5,16 @@ from .DataHeader import DataHeader
 
 
 class DataObject:
+    """A container for packet header and body.
+    Implements self serialization
+    """
     def __init__(self, header: DataHeader, values: List[int]) -> None:
+        """
+        :param header: the packet type
+        :type header: DataHeader
+        :param values: the body of the packet
+        :type values: List[int]
+        """
         self.header: DataHeader = header
         self.values: List[int] = values
 
@@ -16,6 +25,11 @@ class DataObject:
         return self.values
 
     def serialize(self) -> bytes:
+        """serializes the object into a packed struct bytes
+
+        :return: the packed bytes
+        :rtype: bytes
+        """
         return struct.pack(
             f">h{len(self.values)}i", self.header.value, *self.values
         )

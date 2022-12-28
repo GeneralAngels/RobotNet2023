@@ -4,6 +4,9 @@ from ..data_objects.DataObject import DataObject
 
 
 class SenderSocket:
+    """A socket handler for sending data.
+    Implements a client that sends data to listeners.
+    """
     def __init__(self) -> None:
         self.connected = False
         self.sock: socket.socket = socket.socket(
@@ -11,10 +14,24 @@ class SenderSocket:
         )
 
     def connect(self, ip: str, port: int) -> None:
+        """Connects the sender to a listener on a specified ip and port.
+
+        :param ip: the ip of the listener
+        :type ip: str
+        :param port: the port of the listener
+        :type port: int
+        """
         self.sock.connect((ip, port))
         self.connected = True
 
     def send_data(self, data: DataObject) -> None:
+        """Sends a packet to a the listener.
+
+        :param data: the packet wrapped around a DataObject
+        :type data: DataObject
+        :raises Exception: if the sender isn't connected to any listener
+        it will raise an Exception
+        """
         if self.connected:
             self.sock.send(data.serialize())
         else:

@@ -10,10 +10,12 @@ import RIONet.socket_handlers.SenderSocket;
 import RIONet.socket_handlers.SocketHandlerException;
 import RIONet.thread_handlers.ListenerThread;
 
-public class Main {
+public class Main { // TODO implement logging
         public static void main(String[] args) {
-                // listener();
-                sender();
+                listener();
+                // sender();
+                // String format = "3c0fff5t";
+                // System.out.println(StructUtils.parseFormat(format));
         }
 
         public static void sender() {
@@ -34,7 +36,7 @@ public class Main {
 
                         try {
                                 senderSocket.sendData(newPack);
-                                System.out.println(newPack.toString());
+                                System.out.println("sent: " + newPack.toString());
                         } catch (IOException e) {
                                 System.out.println("faied to send packet to listener: " + e);
                         } catch (SocketHandlerException e) {
@@ -63,7 +65,6 @@ public class Main {
 
                 while (true) {
                         DataObject data = listenerThread.getData();
-
                         if (data != null) {
                                 System.out.println(data.toString());
                         }

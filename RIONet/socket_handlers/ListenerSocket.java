@@ -37,17 +37,20 @@ public class ListenerSocket { // TODO implement multiple clients connection
             throw new SocketHandlerException("Must first astablish a connection to sender before recieving data!");
 
         DataHeader header = DataHeader.values()[inStream.readShort()];
+        System.out.println("got header");
         int ibodyLength = NetworkConstants.HeaderPacketSizes.get(header)[0];
-        int dbodyLength = NetworkConstants.HeaderPacketSizes.get(header)[0];
+        int dbodyLength = NetworkConstants.HeaderPacketSizes.get(header)[1];
 
         int[] ibody = new int[ibodyLength];
         double[] dbody = new double[dbodyLength];
         for (int i = 0; i < ibodyLength; i++) {
             ibody[i] = (int) inStream.readInt();
         }
-        for (int i = ibodyLength; i < dbodyLength + ibodyLength; i++) {
+        System.out.println("got ints");
+        for (int i = 0; i < dbodyLength; i++) {
             dbody[i] = (double) inStream.readDouble();
         }
+        System.out.println("got doubles");
         return new DataObject(header, ibody, dbody);
     }
 }

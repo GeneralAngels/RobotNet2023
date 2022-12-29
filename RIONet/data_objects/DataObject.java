@@ -1,5 +1,7 @@
 package RIONet.data_objects;
 
+import java.util.Arrays;
+
 import RIONet.socket_utils.StructUtils;
 
 public class DataObject {
@@ -46,27 +48,20 @@ public class DataObject {
      * @return byte[] the serializd DataObject
      */
     public byte[] serialize() {
-        String format = String.format("%di%dd", ivalues.length, dvalues.length);
-        Object[] body = new Object[ivalues.length + dvalues.length];
+        String format = String.format("h%di%dd", ivalues.length, dvalues.length);
+        Object[] body = new Object[1 + ivalues.length + dvalues.length];
+        body[0] = (short)header.ordinal();
         for (int i = 0; i < ivalues.length; i++) {
-            body[i] = (Object)ivalues[i];
+            body[i + 1] = ivalues[i];
         }
-        for (int i = ivalues.length; i < dvalues.length; i++) {
-            body[i] = (Object)dvalues[i];
+        for (int i = 0; i < dvalues.length; i++) {
+            body[i + ivalues.length + 1] = dvalues[i];
         }
         return StructUtils.pack(format, body);
     }
 
     @Override
     public String toString() {
-        String headeString = header.name() + ": ";
-        String bodyString = "";
-        for (int i : ivalues) {
-            bodyString += Integer.toString(i) + ", ";
-        }
-        for (double d : dvalues) {
-            bodyString += Double.toString(d) + ", ";
-        }
-        return headeString + bodyString;
+        return header.name() + ": " + Arrays.toString(ivalues) + Arrays.toString(dvalues);
     }
 }

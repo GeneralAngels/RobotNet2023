@@ -75,6 +75,8 @@ public class StructUtils {
         format = parseFormat(format);
         int size = sizeOf(format);
 
+        System.out.println(format);
+
         byte[] bytes = new byte[size];
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(ByteOrder.BIG_ENDIAN);
@@ -91,6 +93,9 @@ public class StructUtils {
                     break;
                 case 'd':
                     buffer.putDouble((Double) data[i]);
+                    break;
+                case 'i':
+                    buffer.putInt((Integer) data[i]);
                     break;
             }
         }
@@ -148,20 +153,23 @@ public class StructUtils {
      */
     public static String parseFormat(String format) {
         String newFormat = "";
-        int multiplier = 0;
+        int multiplier = -1;
         for (int i = 0; i < format.length(); i++) {
             char curr = format.charAt(i);
-
-            if (curr == '1' | curr == '2' | curr == '3' | curr == '4' | curr == '5' | curr == '6' | curr == '7' | curr == '8' | curr == '9')
-                multiplier = multiplier * 10 + Character.getNumericValue(curr);
+            if (curr == '1' | curr == '2' | curr == '3' | curr == '4' | curr == '5' | curr == '6' | curr == '7' | curr == '8' | curr == '9' | curr == '0') {
+                if (multiplier == -1)
+                    multiplier = Character.getNumericValue(curr);
+                else
+                    multiplier = multiplier * 10 + Character.getNumericValue(curr);
+            }
 
             else {
-                if (multiplier == 0)
+                if (multiplier == -1)
                     newFormat += curr;
 
                 else
                     newFormat += new String(new char[multiplier]).replace('\0', curr);
-                multiplier = 0;
+                multiplier = -1;
             }
         }
 

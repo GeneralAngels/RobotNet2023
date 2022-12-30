@@ -40,3 +40,6 @@ class SenderSocket:
             raise SockethandlerException(
                 "Must first astablish a connection to listener before sending!"
             )
+
+    def is_connected(self) -> bool:
+        return self.connected

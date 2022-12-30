@@ -23,11 +23,13 @@ class ListenerSocket:
         )
 
         self.client_socket: socket.socket
-
+        print(socket.gethostbyname(socket.gethostname()))
         if local:
             self.server_socket.bind(("127.0.0.1", port))
         else:
-            self.server_socket.bind((socket.gethostname(), port))
+            self.server_socket.bind((
+                "10.22.30.185", port
+            ))
 
     def accept(self) -> None:
         """Accepts a single sender connection to recieve data from

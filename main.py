@@ -8,7 +8,7 @@ from PUNet.data_objects.DataHeader import DataHeader
 
 def listener():
     listener_thread: ListenerThread = ListenerThread(
-        port=6666, local=True, daemon=True
+        port=6666, local=False, daemon=True
     )
 
     listener_thread.start()
@@ -20,7 +20,13 @@ def listener():
 
 def sender():
     sender_sock: SenderSocket = SenderSocket()
-    sender_sock.connect("127.0.0.1", 6666)
+
+    while not sender_sock.is_connected():
+        try:
+            sender_sock.connect("10.22.30.2", 5800)
+        except Exception as e:
+            print(e)
+    print("connected")
     while True:
         sleep(1)
         new_pack = DataObject(DataHeader.EXAMPLE, [1], [2.4, 6.7])
@@ -29,8 +35,8 @@ def sender():
 
 
 def main():
-    sender()
-    # listener()
+    # sender()
+    listener()
 
 
 if __name__ == "__main__":

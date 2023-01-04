@@ -1,36 +1,40 @@
+from __future__ import annotations
 from typing import List
 import struct
+from abc import ABC, abstractmethod, abstractclassmethod
 
 from .DataHeader import DataHeader
 
 
-class DataObject:
+class DataObject(ABC):
     """A container for packet header and body.
     Implements self serialization
     """
-    def __init__(self,
-                 header: DataHeader, ivalues: List[int], dvalues: List[float]
-                 ) -> None:
+    def __init__(self) -> None:
+        pass
+
+    @classmethod
+    def from_bytes(cls, bytes: bytes) -> DataObject:
+        """constructs a DataObject from the raw unpacked bytes"""
+        return cls(*struct.unpack(cls.struct_format(), bytes))
+
+    @abstractclassmethod
+    def header(cls) -> DataHeader:
+        raise NotImplementedError
+
+    @abstractclassmethod
+    def struct_format(cls) -> str:
+        raise NotImplementedError
+
+    @abstractmethod
+    def as_list(self) -> List[any]:
+        """a function that returns a list representing the DataObject values
+        the values are indexed like the format
+
+        :return: a list representing the DataObject
+        :rtype: List[any]
         """
-        :param header: the packet type
-        :type header: DataHeader
-        :param ivalues: the int part of the packet body
-        :type ivalues: List[int]
-        :param dvalues: the double part of the packet body
-        :type dvalues: List[double]
-        """
-        self.header: DataHeader = header
-        self.ivalues: List[int] = ivalues
-        self.dvalues: List[float] = dvalues
-
-    def get_header(self) -> DataHeader:
-        return self.header
-
-    def get_ivalues(self) -> List[int]:
-        return self.ivalues
-
-    def get_dvalues(self) -> List[float]:
-        return self.dvalues
+        raise NotImplementedError
 
     def serialize(self) -> bytes:
         """serializes the object into a packed struct bytes
@@ -38,10 +42,7 @@ class DataObject:
         :return: the packed bytes
         :rtype: bytes
         """
-        return struct.pack(
-            f">h{len(self.ivalues)}i{len(self.dvalues)}d",
-            self.header.value, *self.ivalues, *self.dvalues
-        )
+        return struct.pack(format, *self.as_list())
 
     def __str__(self) -> str:
-        return f"{self.header.name}: {str(self.ivalues)}, {str(self.dvalues)}"
+        return f"[{str(self.header())}]: {self.as_list()}"

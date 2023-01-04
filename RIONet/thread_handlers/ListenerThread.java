@@ -18,7 +18,7 @@ public class ListenerThread extends Thread {
     ReentrantLock lock;
 
     public ListenerThread(int port) throws IOException {
-        lock = new ReentrantLock(); 
+        lock = new ReentrantLock();
         dataQueue = new LinkedList<DataObject>();
         listenerSocket = new ListenerSocket(port);
 

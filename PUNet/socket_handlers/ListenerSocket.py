@@ -48,31 +48,18 @@ class ListenerSocket:
         :return: a single packet sent
         :rtype: DataObject
         """
-        if self.client_socket is not None:
-            recieved = self.client_socket.recv(2)
-            print("header: " + str(recieved))
-            header: DataHeader = DataHeader(
-                struct.unpack(">h", recieved)[0]
-            )
-
-            ibody_length: int = NetworkConstants.headerPacketSizes[header][0]
-            dbody_length: int = NetworkConstants.headerPacketSizes[header][1]
-
-            ibody_bin = self.client_socket.recv(4*ibody_length)
-            print("ibody: " + str(ibody_bin))
-            ibody = struct.unpack(
-                f">{ibody_length}i", ibody_bin
-            )
-            dbody_bin = self.client_socket.recv(8*dbody_length)
-            print("dbody: " + str(dbody_bin))
-
-            dbody = struct.unpack(
-                f">{dbody_length}d", dbody_bin
-            )
-
-            return DataObject(header, ibody, dbody)
-        else:
+        if self.client_socket is None:
             raise SockethandlerException(
                 "Must first astablish a connection \
                 to sender before recieving data!"
             )
+
+        header_raw = self.client_socket.recv(2)
+        header: DataHeader = DataHeader(
+            struct.unpack(">h", header_raw)[0]
+        )
+        body_length = struct.calcsize(NetworkConstants.headerPacketSizes[header])
+
+        body_raw = self.client_socket.recv(body_length)
+
+        return DataObject(header, ibody, dbody)

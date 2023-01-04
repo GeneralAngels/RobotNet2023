@@ -1,9 +1,9 @@
 from time import sleep
+import struct
 
 from PUNet.socket_handlers.SenderSocket import SenderSocket
 from PUNet.thread_handlers.ListenerThread import ListenerThread
-from PUNet.data_objects.DataObject import DataObject
-from PUNet.data_objects.DataHeader import DataHeader
+from PUNet.data_objects.ExampleObject import ExampleObject
 
 
 def listener():
@@ -36,7 +36,9 @@ def sender():
 
 def main():
     # sender()
-    listener()
+    # listener()
+    example_object = ExampleObject.from_bytes(struct.pack("idd", 5, 6.7, 8.7))
+    print(str(example_object))
 
 
 if __name__ == "__main__":

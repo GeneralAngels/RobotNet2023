@@ -4,6 +4,6 @@ from .data_objects.DataHeader import DataHeader
 
 
 class NetworkConstants:  # TODO put sizes in config
-    headerPacketSizes: Dict[DataHeader, Tuple[int, int]] = {
-        DataHeader.EXAMPLE: (1, 2),
+    headerPacketFormats: Dict[DataHeader, str] = {
+        DataHeader.EXAMPLE: 'idd',
     }

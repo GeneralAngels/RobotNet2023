@@ -10,8 +10,8 @@ public final class Constants {
         public final static String PUip = "10.22.30.157";
 
         // TODO: put in config file
-        public static final HashMap<DataHeader, int[]> HeaderPacketSizes = new HashMap<DataHeader, int[]>() {{
-            put(DataHeader.EXAMPLE_HEADER, new int[]{1,2});
+        public static final HashMap<DataHeader, String> HeaderPacketFormats = new HashMap<DataHeader, String>() {{
+            put(DataHeader.EXAMPLE_HEADER, "idd");
         }};
     }
 }

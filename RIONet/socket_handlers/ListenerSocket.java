@@ -7,7 +7,9 @@ import java.net.ServerSocket;
 
 import RIONet.data_objects.DataHeader;
 import RIONet.data_objects.DataObject;
+import RIONet.data_objects.ExampleData;
 import RIONet.Constants.NetworkConstants;
+import RIONet.socket_utils.StructUtils;
 
 public class ListenerSocket { // TODO implement multiple clients connection
 
@@ -37,25 +39,18 @@ public class ListenerSocket { // TODO implement multiple clients connection
             throw new SocketHandlerException("Must first astablish a connection to sender before recieving data!");
 
         DataHeader header = DataHeader.values()[inStream.readShort()];
-        System.out.println("got header");
+        DataObject packet;
         switch(header){
             case EXAMPLE_HEADER:
-                
+                byte[] raw = new byte[StructUtils.sizeOf(NetworkConstants.HeaderPacketFormats.get(DataHeader.EXAMPLE_HEADER))];
+                inStream.read(raw);
+                packet = new ExampleData(raw);
                 break;
             default:
+                packet = null;
                 break;
         }
 
-        int[] ibody = new int[ibodyLength];
-        double[] dbody = new double[dbodyLength];
-        for (int i = 0; i < ibodyLength; i++) {
-            ibody[i] = (int) inStream.readInt();
-        }
-        System.out.println("got ints");
-        for (int i = 0; i < dbodyLength; i++) {
-            dbody[i] = (double) inStream.readDouble();
-        }
-        System.out.println("got doubles");
-        return new DataObject(header, ibody, dbody);
+        return packet;
     }
 }

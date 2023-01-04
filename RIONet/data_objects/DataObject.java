@@ -44,7 +44,7 @@ public abstract class DataObject {
         return header;
     }
 
-    public String getHeaderFormat() {
+    public String getStructFormat() {
         return format;
     }
 

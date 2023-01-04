@@ -6,6 +6,7 @@ import java.lang.Thread;
 import RIONet.Constants.NetworkConstants;
 import RIONet.data_objects.DataHeader;
 import RIONet.data_objects.DataObject;
+import RIONet.data_objects.ExampleData;
 import RIONet.socket_handlers.SenderSocket;
 import RIONet.socket_handlers.SocketHandlerException;
 import RIONet.thread_handlers.ListenerThread;
@@ -14,8 +15,6 @@ public class Main { // TODO implement logging
         public static void main(String[] args) {
                 listener();
                 // sender();
-                // String format = "3c0fff5t";
-                // System.out.println(StructUtils.parseFormat(format));
         }
 
         public static void sender() {
@@ -30,9 +29,7 @@ public class Main { // TODO implement logging
                 }
 
                 while (true) {
-                        int[] ibody = new int[] {7};
-                        double[] dbody = new double[] {3.5, 6.7};
-                        DataObject newPack = new DataObject(DataHeader.EXAMPLE_HEADER, ibody, dbody);
+                        ExampleData newPack = new ExampleData(1, 2.3, 5.6);
 
                         try {
                                 senderSocket.sendData(newPack);

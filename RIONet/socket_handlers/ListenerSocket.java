@@ -38,8 +38,13 @@ public class ListenerSocket { // TODO implement multiple clients connection
 
         DataHeader header = DataHeader.values()[inStream.readShort()];
         System.out.println("got header");
-        int ibodyLength = NetworkConstants.HeaderPacketSizes.get(header)[0];
-        int dbodyLength = NetworkConstants.HeaderPacketSizes.get(header)[1];
+        switch(header){
+            case EXAMPLE_HEADER:
+                
+                break;
+            default:
+                break;
+        }
 
         int[] ibody = new int[ibodyLength];
         double[] dbody = new double[dbodyLength];

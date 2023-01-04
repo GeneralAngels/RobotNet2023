@@ -2,66 +2,63 @@ package RIONet.data_objects;
 
 import java.util.Arrays;
 
-import RIONet.socket_utils.StructUtils;
 
-public class DataObject {
-    private DataHeader header;
-    private int[] ivalues;
-    private double[] dvalues;
+/**
+ * A generalized wrapper for all packet types.
+ * Other types must override serialize, deserialize and more
+ */
+public abstract class DataObject {
+    protected final DataHeader header;
+    protected final String format;
 
-    public DataObject(DataHeader header, int[] ivalues, double[] dvalues) {
+    /**
+     * A contructor used for creating a new Object from a serialized byte array
+     */
+    public DataObject(byte[] data, DataHeader header, String format) {
         this.header = header;
-        this.ivalues = ivalues;
-        this.dvalues = dvalues;
+        this.format = format;
+        deserialize(data);
     }
 
     /**
-     * get the header of the DataObject
-     *
-     * @return DataHeader the header
+     * A more general constructor
      */
+    public DataObject(DataHeader header, String format) {
+        this.header = header;
+        this.format = format;
+    }
+
+    /**
+     * Serializes the object into a packed byte array
+     * @return the unpacked data
+     */
+    public abstract byte[] serialize();
+
+    /**
+     * returns an instance of the object created by unpacking a byte array
+     * @param data the packed byte array
+     */
+    public abstract void deserialize(byte[] data);
+
     public DataHeader getHeader() {
         return header;
     }
 
-    /**
-     * get the int part of the DataObject body
-     *
-     * @return int[] the body
-     */
-    public int[] getIValues() {
-        return ivalues;
+    public String getHeaderFormat() {
+        return format;
     }
 
     /**
-     * get the double part of the DataObject body
-     *
-     * @return double[] the body
+     * @return the object body as an object array
      */
-    public double[] getDValues() {
-        return dvalues;
-    }
+    public abstract Object[] getBody();
 
     /**
-     * serializes the DataObject into an array of bytes
-     *
-     * @return byte[] the serializd DataObject
+     * @return the object header and body as an object array
      */
-    public byte[] serialize() {
-        String format = String.format("h%di%dd", ivalues.length, dvalues.length);
-        Object[] body = new Object[1 + ivalues.length + dvalues.length];
-        body[0] = (short)header.ordinal();
-        for (int i = 0; i < ivalues.length; i++) {
-            body[i + 1] = ivalues[i];
-        }
-        for (int i = 0; i < dvalues.length; i++) {
-            body[i + ivalues.length + 1] = dvalues[i];
-        }
-        return StructUtils.pack(format, body);
-    }
+    public abstract Object[] asObjectArray();
 
-    @Override
     public String toString() {
-        return header.name() + ": " + Arrays.toString(ivalues) + Arrays.toString(dvalues);
+        return Arrays.toString(getBody());
     }
 }

@@ -51,12 +51,23 @@ public class StructUtils {
                 case 'd': // double
                     buffer = ByteBuffer.allocate(8);
                     buffer.order(ByteOrder.BIG_ENDIAN);
-                    for (int k = 0; i < 8; i++) {
+                    for (int k = 0; k < 8; k++) {
                         buffer.put(raw[pos + k]);
                     }
-
+                    buffer.flip();
                     result[i] = buffer.getDouble();
                     pos += 8;
+                    break;
+                case 'i': // int
+                    buffer = ByteBuffer.allocate(4);
+                    buffer.order(ByteOrder.BIG_ENDIAN);
+                    for (int k = 0; k < 4; k++) {
+                        buffer.put(raw[pos + k]);
+                    }
+                    buffer.flip();
+
+                    result[i] = buffer.getInt();
+                    pos += 4;
                     break;
             }
         }
@@ -74,8 +85,6 @@ public class StructUtils {
     public static byte[] pack(String format, Object[] data) {
         format = parseFormat(format);
         int size = sizeOf(format);
-
-        System.out.println(format);
 
         byte[] bytes = new byte[size];
         ByteBuffer buffer = ByteBuffer.wrap(bytes);

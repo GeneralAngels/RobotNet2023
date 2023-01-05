@@ -32,7 +32,6 @@ public class SenderSocket {
     public void sendData(DataObject data) throws IOException, SocketHandlerException {
         if (outStream == null)
             throw new SocketHandlerException("Must first astablish a connection to listener before sending!");
-        System.out.println("serialized: " + data.serialize().toString());
         outStream.write(data.serialize());
     }
 }

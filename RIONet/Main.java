@@ -2,19 +2,28 @@ package RIONet;
 
 import java.io.IOException;
 import java.lang.Thread;
+import java.util.Arrays;
 
 import RIONet.Constants.NetworkConstants;
-import RIONet.data_objects.DataHeader;
 import RIONet.data_objects.DataObject;
 import RIONet.data_objects.ExampleData;
 import RIONet.socket_handlers.SenderSocket;
 import RIONet.socket_handlers.SocketHandlerException;
+import RIONet.socket_utils.StructUtils;
 import RIONet.thread_handlers.ListenerThread;
 
 public class Main { // TODO implement logging
         public static void main(String[] args) {
                 listener();
                 // sender();
+                // Object[] body = new Object[] {
+                //         (Object)(int)2,
+                //         (Object)(double)7.8,
+                //         (Object)(double)2.5
+                // };
+                // byte[] ser = StructUtils.pack("idd", body);
+                // ExampleData ed = new ExampleData(ser);
+                // System.out.println(ed.toString());
         }
 
         public static void sender() {
@@ -33,6 +42,7 @@ public class Main { // TODO implement logging
 
                         try {
                                 senderSocket.sendData(newPack);
+                                System.out.println("serialized: " + Arrays.toString(newPack.serialize()));
                                 System.out.println("sent: " + newPack.toString());
                         } catch (IOException e) {
                                 System.out.println("faied to send packet to listener: " + e);

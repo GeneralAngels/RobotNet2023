@@ -2,6 +2,7 @@ package RIONet.data_objects;
 
 import java.util.Arrays;
 
+import RIONet.socket_utils.StructUtils;
 
 /**
  * A generalized wrapper for all packet types.
@@ -32,7 +33,9 @@ public abstract class DataObject {
      * Serializes the object into a packed byte array
      * @return the unpacked data
      */
-    public abstract byte[] serialize();
+    public byte[] serialize() {
+        return StructUtils.pack("h" + format, asObjectArray());
+    }
 
     /**
      * returns an instance of the object created by unpacking a byte array
@@ -49,16 +52,14 @@ public abstract class DataObject {
     }
 
     /**
-     * @return the object body as an object array
-     */
-    public abstract Object[] getBody();
-
-    /**
      * @return the object header and body as an object array
      */
     public abstract Object[] asObjectArray();
 
     public String toString() {
-        return Arrays.toString(getBody());
+        Object[] objects = asObjectArray();
+        String header = (DataHeader.values()[(Integer.valueOf((short)objects[0]))]).name();
+        String body = Arrays.toString(Arrays.copyOfRange(objects, 1, objects.length));
+        return String.format("[%s]: %s", header, body);
     }
 }

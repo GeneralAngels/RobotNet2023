@@ -30,7 +30,6 @@ public class ListenerThread extends Thread {
             try {
                 DataObject data = listenerSocket.getData();
                 lock.lock();
-
                 try {
                     dataQueue.add(data);
                 } finally {

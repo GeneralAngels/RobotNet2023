@@ -3,6 +3,7 @@ import struct
 
 from ..data_objects.DataHeader import DataHeader
 from ..data_objects.DataObject import DataObject
+from ..data_objects.ExampleObject import ExampleObject
 from ..Constants import NetworkConstants
 from .SockethandlerException import SockethandlerException
 
@@ -58,8 +59,14 @@ class ListenerSocket:
         header: DataHeader = DataHeader(
             struct.unpack(">h", header_raw)[0]
         )
-        body_length = struct.calcsize(NetworkConstants.headerPacketSizes[header])
+        body_length = struct.calcsize(
+            NetworkConstants.headerPacketFormats[header]
+        )
 
         body_raw = self.client_socket.recv(body_length)
-
-        return DataObject(header, ibody, dbody)
+        print(body_raw)
+        match header:
+            case DataHeader.EXAMPLE:
+                return ExampleObject.from_bytes(body_raw)
+            case _:
+                return None

@@ -24,28 +24,12 @@ public class ExampleData extends DataObject {
     }
 
     @Override
-    public byte[] serialize() {
-        return StructUtils.pack(format, asObjectArray());
-    }
-
-    @Override
     public void deserialize(byte[] data) {
         Object[] body = StructUtils.unpack(format, data);
 
         dummyInt = (int)body[0];
         dummyDouble1 = (double)body[1];
         dummyDouble2 = (double)body[2];
-    }
-
-    @Override
-    public Object[] getBody() {
-        Object[] body = new Object[format.length()];
-
-        body[0] = (Object)dummyInt;
-        body[1] = (Object)dummyDouble1;
-        body[2] = (Object)dummyDouble2;
-
-        return body;
     }
 
     @Override
@@ -57,5 +41,5 @@ public class ExampleData extends DataObject {
         objects[3] = (Object)dummyDouble2;
 
         return objects;
-        }
+    }
 }

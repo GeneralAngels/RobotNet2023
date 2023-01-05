@@ -1,6 +1,7 @@
 package RIONet.socket_handlers;
 
 import java.net.Socket;
+import java.util.Arrays;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -44,6 +45,7 @@ public class ListenerSocket { // TODO implement multiple clients connection
             case EXAMPLE_HEADER:
                 byte[] raw = new byte[StructUtils.sizeOf(NetworkConstants.HeaderPacketFormats.get(DataHeader.EXAMPLE_HEADER))];
                 inStream.read(raw);
+                System.out.println(Arrays.toString(raw));
                 packet = new ExampleData(raw);
                 break;
             default:

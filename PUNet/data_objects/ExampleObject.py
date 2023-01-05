@@ -13,12 +13,12 @@ class ExampleObject(DataObject):
         self.dummydouble2: float = values[2]
 
     @classmethod
-    def header(cls) -> DataHeader:
+    def get_header(cls) -> DataHeader:
         return DataHeader.EXAMPLE
 
     @classmethod
-    def struct_format(cls) -> str:
+    def get_struct_format(cls) -> str:
         return "idd"
 
     def as_list(self) -> List[any]:
-        return [self.dummyint, self.dummydouble1, self.dummydouble2]
+        return [self.get_header().value, self.dummyint, self.dummydouble1, self.dummydouble2]

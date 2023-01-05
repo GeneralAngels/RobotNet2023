@@ -16,14 +16,14 @@ class DataObject(ABC):
     @classmethod
     def from_bytes(cls, bytes: bytes) -> DataObject:
         """constructs a DataObject from the raw unpacked bytes"""
-        return cls(*struct.unpack(cls.struct_format(), bytes))
+        return cls(*struct.unpack(">" + cls.get_struct_format(), bytes))
 
     @abstractclassmethod
-    def header(cls) -> DataHeader:
+    def get_header(cls) -> DataHeader:
         raise NotImplementedError
 
     @abstractclassmethod
-    def struct_format(cls) -> str:
+    def get_struct_format(cls) -> str:
         raise NotImplementedError
 
     @abstractmethod
@@ -42,7 +42,7 @@ class DataObject(ABC):
         :return: the packed bytes
         :rtype: bytes
         """
-        return struct.pack(format, *self.as_list())
+        return struct.pack(">h" + self.get_struct_format(), *self.as_list())
 
     def __str__(self) -> str:
-        return f"[{str(self.header())}]: {self.as_list()}"
+        return f"[{str(self.get_header())}]: {self.as_list()}"

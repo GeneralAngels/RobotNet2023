@@ -2,24 +2,30 @@ from time import sleep
 
 from PUNet.socket_handlers.SenderSocket import SenderSocket
 from PUNet.thread_handlers.ListenerThread import ListenerThread
-from PUNet.data_objects.DataObject import DataObject
-from PUNet.data_objects.DataHeader import DataHeader
+from PUNet.Packet import Packet
+from PUNet.PacketBuilder import PacketBuilder
 
 
 def listener():
     listener_thread: ListenerThread = ListenerThread(
-        port=6666, local=False, daemon=True
+        port=6666, packet_directory="packets"
     )
 
     listener_thread.start()
     print('listener started')
 
     while True:
-        print(str(listener_thread.getData()))
+        pack: Packet = listener_thread.get_packet()
+        print(str(pack))
+
+        match pack.header:
+            case "test":
+                print(pack.get_item("test"))
 
 
 def sender():
     sender_sock: SenderSocket = SenderSocket()
+    builder: PacketBuilder = PacketBuilder("packets")
 
     while not sender_sock.is_connected():
         try:
@@ -29,7 +35,9 @@ def sender():
     print("connected")
     while True:
         sleep(1)
-        new_pack = DataObject(DataHeader.EXAMPLE, [1], [2.4, 6.7])
+        new_pack: Packet = builder.build_from_fields(
+            "test", test=1, test2=2
+        )
         sender_sock.send_data(new_pack)
         print(f'sent data: {str(new_pack)}, ser: {str(new_pack.serialize())}')
 

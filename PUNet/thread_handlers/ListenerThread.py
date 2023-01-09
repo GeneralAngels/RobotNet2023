@@ -3,14 +3,14 @@ from queue import Queue
 import socket
 
 from PUNet.socket_handlers.ListenerSocket import ListenerSocket
-from PUNet.data_objects.DataObject import DataObject
+from PUNet.Packet import Packet
 
 
 class ListenerThread(Thread):
     """A thread handler for a listener that will continuously listen
     on a specified port and insert all data recieved into a queue
     """
-    def __init__(self, port: int, local: bool, daemon: bool) -> None:
+    def __init__(self, port: int, packet_directory: str) -> None:
         """
         :param port: the port to listen on
         :type port: int
@@ -19,9 +19,11 @@ class ListenerThread(Thread):
         :param daemon: whether to run the thread as daemon
         :type daemon: bool
         """
-        super().__init__(daemon=daemon)
-        self.listener_socket: ListenerSocket = ListenerSocket(port, local)
-        self.data_queue: "Queue[DataObject]" = Queue()
+        super().__init__()
+        self.listener_socket: ListenerSocket = ListenerSocket(
+            port, packet_directory
+        )
+        self.data_queue: "Queue[Packet]" = Queue()
 
         self.running = True
 
@@ -33,7 +35,7 @@ class ListenerThread(Thread):
             except socket.error as e:
                 print("Failed to recieve data from sender: " + e)
 
-    def getData(self) -> DataObject:
+    def get_packet(self) -> Packet:
         """Retrieves data from the data queue
 
         :return: a DataObject wrapped packet

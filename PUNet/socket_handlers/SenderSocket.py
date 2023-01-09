@@ -1,6 +1,6 @@
 import socket
 
-from ..data_objects.DataObject import DataObject
+from PUNet.Packet import Packet
 from .SockethandlerException import SockethandlerException
 
 
@@ -25,7 +25,7 @@ class SenderSocket:
         self.sock.connect((ip, port))
         self.connected = True
 
-    def send_data(self, data: DataObject) -> None:
+    def send_data(self, data: Packet) -> None:
         """Sends a packet to a the listener.
 
         :param data: the packet wrapped around a DataObject

@@ -1,17 +1,16 @@
 import socket
 import struct
 
-from ..data_objects.DataHeader import DataHeader
-from ..data_objects.DataObject import DataObject
-from ..Constants import NetworkConstants
 from .SockethandlerException import SockethandlerException
+from PUNet.Packet import Packet
+from PUNet.PacketBuilder import PacketBuilder
 
 
 class ListenerSocket:
     """A socket handler for listening for data.
     Implements a server that listens for sender connections.
     """
-    def __init__(self, port: int, local: bool) -> None:
+    def __init__(self, port: int, packet_directory: str) -> None:
         """
         :param port: the port to listen on
         :type port: int
@@ -23,13 +22,9 @@ class ListenerSocket:
         )
 
         self.client_socket: socket.socket
-        print(socket.gethostbyname(socket.gethostname()))
-        if local:
-            self.server_socket.bind(("127.0.0.1", port))
-        else:
-            self.server_socket.bind((
-                "10.22.30.185", port
-            ))
+        self.server_socket.bind(("127.0.0.1", port))
+
+        self.packet_builder: PacketBuilder = PacketBuilder(packet_directory)
 
     def accept(self) -> None:
         """Accepts a single sender connection to recieve data from
@@ -37,40 +32,30 @@ class ListenerSocket:
         self.server_socket.listen(1)
         self.client_socket, addr = self.server_socket.accept()
 
-    def get_data(self) -> DataObject:
+    def get_data(self) -> Packet:
         """Gets a single packet sent from a sender.
-        the packet will be wrapped around a DataObject.
+        the packet will be wrapped around a Packet object.
         If there isnt an available packet on buffer it will wait for one.
 
         :raises SockethandlerException:
         if the listener didn't accept any clients,
         it will raise an Exception
         :return: a single packet sent
-        :rtype: DataObject
+        :rtype: Packet
         """
         if self.client_socket is not None:
-            recieved = self.client_socket.recv(2)
-            print("header: " + str(recieved))
-            header: DataHeader = DataHeader(
-                struct.unpack(">h", recieved)[0]
+            header_length = self.client_socket.recv(2)
+            print("header length: " + str(header_length))
+            raw_header = self.client_socket.recv(header_length)
+            header: str = (
+                struct.unpack(">s", raw_header)[0]
             )
 
-            ibody_length: int = NetworkConstants.headerPacketSizes[header][0]
-            dbody_length: int = NetworkConstants.headerPacketSizes[header][1]
-
-            ibody_bin = self.client_socket.recv(4*ibody_length)
-            print("ibody: " + str(ibody_bin))
-            ibody = struct.unpack(
-                f">{ibody_length}i", ibody_bin
+            return self.packet_builder.build_from_raw(
+                header, self.client_socket.recv(
+                    PacketBuilder.size_of(header)
+                )
             )
-            dbody_bin = self.client_socket.recv(8*dbody_length)
-            print("dbody: " + str(dbody_bin))
-
-            dbody = struct.unpack(
-                f">{dbody_length}d", dbody_bin
-            )
-
-            return DataObject(header, ibody, dbody)
         else:
             raise SockethandlerException(
                 "Must first astablish a connection \

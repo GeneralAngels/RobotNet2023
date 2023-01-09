@@ -4,13 +4,14 @@ import socket
 
 from PUNet.socket_handlers.ListenerSocket import ListenerSocket
 from PUNet.Packet import Packet
+from PUNet.PacketBuilder import PacketBuilder
 
 
 class ListenerThread(Thread):
     """A thread handler for a listener that will continuously listen
     on a specified port and insert all data recieved into a queue
     """
-    def __init__(self, port: int, packet_directory: str) -> None:
+    def __init__(self, port: int, packet_builder: PacketBuilder) -> None:
         """
         :param port: the port to listen on
         :type port: int
@@ -21,7 +22,7 @@ class ListenerThread(Thread):
         """
         super().__init__()
         self.listener_socket: ListenerSocket = ListenerSocket(
-            port, packet_directory
+            port, packet_builder
         )
         self.data_queue: "Queue[Packet]" = Queue()
 

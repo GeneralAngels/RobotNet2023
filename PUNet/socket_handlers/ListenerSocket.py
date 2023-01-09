@@ -10,7 +10,7 @@ class ListenerSocket:
     """A socket handler for listening for data.
     Implements a server that listens for sender connections.
     """
-    def __init__(self, port: int, packet_directory: str) -> None:
+    def __init__(self, port: int, packet_builder: PacketBuilder) -> None:
         """
         :param port: the port to listen on
         :type port: int
@@ -24,7 +24,7 @@ class ListenerSocket:
         self.client_socket: socket.socket
         self.server_socket.bind(("127.0.0.1", port))
 
-        self.packet_builder: PacketBuilder = PacketBuilder(packet_directory)
+        self.packet_builder = packet_builder
 
     def accept(self) -> None:
         """Accepts a single sender connection to recieve data from

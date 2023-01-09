@@ -7,8 +7,9 @@ from PUNet.PacketBuilder import PacketBuilder
 
 
 def listener():
+    builder: PacketBuilder = PacketBuilder("packets")
     listener_thread: ListenerThread = ListenerThread(
-        port=6666, packet_directory="packets"
+        port=6666, packet_builder=builder
     )
 
     listener_thread.start()

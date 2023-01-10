@@ -21,7 +21,7 @@ def listener():
 
         match pack.header:
             case "test":
-                print(pack.get_item("test"))
+                print(pack.get_field("test"))
 
 
 def sender():

@@ -15,27 +15,42 @@ class PacketBuilder:
     def init_packets(self) -> None:
         pass
 
-    def build_from_fields(self, header: str, **fieldes: Any) -> Packet:
-        """Builds a packet from it's fields.
+    def build_from_header(self, header: str) -> Packet:
+        """Builds an empty packet with only empty fields.
 
         :param header: the header of the packet
         :type header: str
-        :return: the built packet
+        :return: the empty packet
         :rtype: Packet
         """
-        return Packet(header, self.format_of(header), **fieldes)
+        return Packet(header, self.format_of(header), *self.fields_of(header))
 
     def build_from_raw(self, header: str, raw: bytes) -> Packet:
         """Builds a packet from raw bytes.
 
         :param header: the header of the packet
         :type header: str
-        :param raw: the raw bytes of the packet
+        :param raw: the raw bytes of the packet body
         :type raw: bytes
         :return: the built packet
         :rtype: Packet
         """
-        return Packet(struct.unpack(self.format_of(header), raw))
+        new_pack = self.build_from_header(header)
+        new_pack.set_fields(**self.fields_from_raw(header, raw))
+        return new_pack
+
+    def fields_from_raw(self, header: str, raw: bytes) -> Dict[str, Any]:
+        """Returns the fields and values of the packet from raw bytes.
+
+        :param header: the header of the packet
+        :type header: str
+        :param raw: the raw bytes of the packet body
+        :type raw: bytes
+        :return: the fields and values of the packet
+        :rtype: Dict[str, Any]
+        """
+        return dict(zip(self.fields_of(header),
+                        struct.unpack(self.format_of(header), raw)))
 
     def size_of(self, header: str) -> int:
         """Returns the number of bytes the packet has.
@@ -66,5 +81,3 @@ class PacketBuilder:
         :rtype: List[str]
         """
         return self.packets[header].keys()
-
-        

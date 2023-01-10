@@ -7,10 +7,10 @@ class Packet:
     A packet should only be created using a PacketBuilder.
     """
     def __init__(self, header: str, fmt: str,
-                 **data: Any) -> None:
+                 *fields: Any) -> None:
         self.header = header
         self.fmt = fmt
-        self.data: Dict[str, Any] = data
+        self.data: Dict[str, Any] = {field: None for field in fields}
 
     def serialize(self) -> bytes:
         """Serializes the packet into a byte array.
@@ -24,11 +24,12 @@ class Packet:
         return struct.pack(">hs" + self.fmt,
                            len(self.header), self.header, *self.data.values())
 
-    def get_item(self, key: str) -> Any:
-        return self.data[key]
+    def get_field(self, field: str) -> Any:
+        return self.data[field]
 
-    def set_item(self, key: str, new_value: Any) -> None:
-        self.data[key] = new_value
+    def set_fields(self, **fields: Any) -> None:
+        for field, new_value in fields.items():
+            self.data[field] = new_value
 
     def __str__(self) -> str:
         return self.header + str(self.data.items())

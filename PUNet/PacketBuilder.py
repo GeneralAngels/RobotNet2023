@@ -66,5 +66,18 @@ class PacketBuilder:
         :rtype: List[str]
         """
         return self.packets[header].keys()
+    def _get_conf_dict(self) -> dict[str, dict[str, chr]]:
+        '''
+            Returns a dictionary of all packets structures that are defined in the defined directory.
+        '''
+        general_dict = {}  # A dictionary of all packet's stractures.
+        # Go over all of the files and connectes thier packet structures into one dictionary.
+        for filename in os.listdir(self.packet_directory):  
+            if filename.endswith(".packet"):
+                conf_yaml = open(self.packet_directory + filename, "r")
+                yaml_data = yaml.load(conf_yaml, Loader=yaml.FullLoader)
+                conf_yaml.close()
+                general_dict.update(yaml_data)
 
+        return general_dict
         

@@ -29,6 +29,8 @@ public class Main { // TODO implement logging
 
                 while (true) {
                         Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
+                        packet.setField("ifield1", 2);
+                        packet.setField("dfield2", 4.8);
 
                         try {
                                 senderSocket.sendData(packet);
@@ -65,6 +67,11 @@ public class Main { // TODO implement logging
                         Packet packet = listenerThread.getPacket();
                         if (packet != null) {
                                 System.out.println(packet.toString());
+                                int ifield1 = packet.getField("ifield1");
+                                double dfield2 = packet.getField("dfield2");
+
+                                System.out.println("ifield1: " + ifield1);
+                                System.out.println("dfield2: " + dfield2);
                         }
                 }
         }

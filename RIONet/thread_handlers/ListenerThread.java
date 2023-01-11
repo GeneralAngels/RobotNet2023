@@ -7,20 +7,21 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import RIONet.socket_handlers.ListenerSocket;
 import RIONet.socket_handlers.SocketHandlerException;
-import RIONet.data_objects.DataObject;
+import RIONet.Packet;
+import RIONet.PacketBuilder;
 
 /** Add your docs here. */
 public class ListenerThread extends Thread {
 
-    private Queue<DataObject> dataQueue;
+    private Queue<Packet> packetQueue;
     private ListenerSocket listenerSocket;
 
     ReentrantLock lock;
 
-    public ListenerThread(int port) throws IOException {
-        lock = new ReentrantLock(); 
-        dataQueue = new LinkedList<DataObject>();
-        listenerSocket = new ListenerSocket(port);
+    public ListenerThread(int port, PacketBuilder packetBuilder) throws IOException {
+        lock = new ReentrantLock();
+        packetQueue = new LinkedList<Packet>();
+        listenerSocket = new ListenerSocket(port, packetBuilder);
 
         listenerSocket.accept();
     }
@@ -28,11 +29,11 @@ public class ListenerThread extends Thread {
     public void run() {
         while (true) {
             try {
-                DataObject data = listenerSocket.getData();
+                Packet packet = listenerSocket.getPacket();
                 lock.lock();
 
                 try {
-                    dataQueue.add(data);
+                    packetQueue.add(packet);
                 } finally {
                     lock.unlock();
                 }
@@ -45,15 +46,15 @@ public class ListenerThread extends Thread {
     }
 
     /**
-     * get the next DataObject from the recieved task queue
-     * 
-     * @return DataObject a DataObject from the threads tasks queue, returns null if
-     *         the queue is empty
+     * get the next packet from the recieved packet queue
+     *
+     * @return a Packet from the threads packet queue, returns null if
+     * the queue is empty
      */
-    public DataObject getData() {
+    public Packet getPacket() {
         lock.lock();
         try {
-            return dataQueue.poll();
+            return packetQueue.poll();
         } finally {
             lock.unlock();
         }

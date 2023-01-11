@@ -71,7 +71,8 @@ def tests():
     ).decode("utf-8")
     print("header: " + str(header))
 
-    print("raw body: " + str(ser[2 + header_length: 2 + header_length + builder.size_of(header)]))
+    print("raw body: " + str(ser[
+        2 + header_length: 2 + header_length + builder.size_of(header)]))
     print("format: " + builder.format_of(header))
     print("size: " + str(builder.size_of(header)))
     n = builder.build_from_raw(

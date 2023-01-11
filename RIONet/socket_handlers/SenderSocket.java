@@ -4,7 +4,7 @@ import java.net.Socket;
 import java.io.IOException;
 import java.io.DataOutputStream;
 
-import RIONet.data_objects.DataObject;
+import RIONet.Packet;
 
 public class SenderSocket {
     private Socket sock;
@@ -15,7 +15,7 @@ public class SenderSocket {
 
     /**
      * connects the sender to a listener on the given ip and port
-     * 
+     *
      * @param ip   the ip of the listener to connect to
      * @param port the port of the listener to connect to
      */
@@ -29,10 +29,10 @@ public class SenderSocket {
      *
      * @param data DataObject the data to send
      */
-    public void sendData(DataObject data) throws IOException, SocketHandlerException {
+    public void sendData(Packet packet) throws IOException, SocketHandlerException {
         if (outStream == null)
             throw new SocketHandlerException("Must first astablish a connection to listener before sending!");
-        System.out.println("serialized: " + data.serialize().toString());
-        outStream.write(data.serialize());
+        System.out.println("serialized: " + packet.serialize().toString());
+        outStream.write(packet.serialize());
     }
 }

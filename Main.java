@@ -1,14 +1,11 @@
-package RIONet;
-
 import java.io.IOException;
 import java.lang.Thread;
 
-import RIONet.Constants.NetworkConstants;
-import RIONet.data_objects.DataHeader;
-import RIONet.data_objects.DataObject;
 import RIONet.socket_handlers.SenderSocket;
 import RIONet.socket_handlers.SocketHandlerException;
 import RIONet.thread_handlers.ListenerThread;
+import RIONet.Packet;
+import RIONet.PacketBuilder;
 
 public class Main { // TODO implement logging
         public static void main(String[] args) {
@@ -19,6 +16,7 @@ public class Main { // TODO implement logging
         }
 
         public static void sender() {
+                PacketBuilder builder = new PacketBuilder("packets");
                 SenderSocket senderSocket = new SenderSocket();
                 String ip = "127.0.0.1";
                 int port = 6666;
@@ -30,13 +28,11 @@ public class Main { // TODO implement logging
                 }
 
                 while (true) {
-                        int[] ibody = new int[] {7};
-                        double[] dbody = new double[] {3.5, 6.7};
-                        DataObject newPack = new DataObject(DataHeader.EXAMPLE_HEADER, ibody, dbody);
+                        Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
 
                         try {
-                                senderSocket.sendData(newPack);
-                                System.out.println("sent: " + newPack.toString());
+                                senderSocket.sendData(packet);
+                                System.out.println("sent: " + packet.toString());
                         } catch (IOException e) {
                                 System.out.println("faied to send packet to listener: " + e);
                         } catch (SocketHandlerException e) {
@@ -51,22 +47,24 @@ public class Main { // TODO implement logging
         }
 
         public static void listener() {
+                PacketBuilder builder = new PacketBuilder("packets");
+
                 ListenerThread listenerThread = null;
                 while (listenerThread == null) {
                         try {
-                                listenerThread = new ListenerThread(NetworkConstants.DEFAULT_PORT);
+                                listenerThread = new ListenerThread(6666, builder);
                                 System.out.println("started listener");
                         } catch (IOException e) {
-                                System.out.println(String.format("An error has accured while trying to start a socket on port %d: ", NetworkConstants.DEFAULT_PORT) + e);
+                                System.out.println("An error has accured while trying to start a socket on port 6666" + e);
                         }
                 }
 
                 listenerThread.start();
 
                 while (true) {
-                        DataObject data = listenerThread.getData();
-                        if (data != null) {
-                                System.out.println(data.toString());
+                        Packet packet = listenerThread.getPacket();
+                        if (packet != null) {
+                                System.out.println(packet.toString());
                         }
                 }
         }

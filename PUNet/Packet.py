@@ -21,8 +21,11 @@ class Packet:
         :return: the serialized packet
         :rtype: str
         """
-        return struct.pack(">hs" + self.fmt,
-                           len(self.header), self.header, *self.data.values())
+        return struct.pack(
+            f">h{len(self.header)}s{self.fmt}",  # format
+            len(self.header), self.header.encode("utf-8"),  # header
+            *self.data.values()  # data
+        )
 
     def get_field(self, field: str) -> Any:
         return self.data[field]

@@ -2,8 +2,8 @@ import socket
 import struct
 
 from .SockethandlerException import SockethandlerException
-from PUNet.Packet import Packet
-from PUNet.PacketBuilder import PacketBuilder
+from ..Packet import Packet
+from ..PacketBuilder import PacketBuilder
 
 
 class ListenerSocket:
@@ -44,16 +44,17 @@ class ListenerSocket:
         :rtype: Packet
         """
         if self.client_socket is not None:
-            header_length = self.client_socket.recv(2)
+            header_length = int.from_bytes(self.client_socket.recv(2), "big")
             print("header length: " + str(header_length))
+            # struct strings are all chars + empty byte
             raw_header = self.client_socket.recv(header_length)
             header: str = (
-                struct.unpack(">s", raw_header)[0]
-            )
+                struct.unpack(f">{header_length}s", raw_header)[0]
+            ).decode("utf-8")
 
             return self.packet_builder.build_from_raw(
                 header, self.client_socket.recv(
-                    PacketBuilder.size_of(header)
+                    self.packet_builder.size_of(header)
                 )
             )
         else:

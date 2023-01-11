@@ -25,17 +25,16 @@ class SenderSocket:
         self.sock.connect((ip, port))
         self.connected = True
 
-    def send_data(self, data: Packet) -> None:
+    def send_data(self, packet: Packet) -> None:
         """Sends a packet to a the listener.
 
-        :param data: the packet wrapped around a DataObject
-        :type data: DataObject
+        :param data: the packet
+        :type data: Packet
         :raises SockethandlerException:
         if the sender isn't connected to any listener
-        it will raise an Exception
         """
         if self.connected:
-            self.sock.send(data.serialize())
+            self.sock.send(packet.serialize())
         else:
             raise SockethandlerException(
                 "Must first astablish a connection to listener before sending!"

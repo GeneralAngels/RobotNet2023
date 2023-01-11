@@ -2,9 +2,9 @@ from threading import Thread
 from queue import Queue
 import socket
 
-from PUNet.socket_handlers.ListenerSocket import ListenerSocket
-from PUNet.Packet import Packet
-from PUNet.PacketBuilder import PacketBuilder
+from ..socket_handlers.ListenerSocket import ListenerSocket
+from ..Packet import Packet
+from ..PacketBuilder import PacketBuilder
 
 
 class ListenerThread(Thread):
@@ -37,9 +37,9 @@ class ListenerThread(Thread):
                 print("Failed to recieve data from sender: " + e)
 
     def get_packet(self) -> Packet:
-        """Retrieves data from the data queue
+        """Retrieves a packet from the packet queue
 
-        :return: a DataObject wrapped packet
-        :rtype: DataObject
+        :return: a packet
+        :rtype: Packet
         """
         return self.data_queue.get()

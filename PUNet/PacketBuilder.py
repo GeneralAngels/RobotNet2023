@@ -1,5 +1,8 @@
-from typing import Dict, Any, List
+from typing import Dict, List
 import struct
+
+import yaml
+import os
 
 from PUNet.Packet import Packet
 
@@ -10,10 +13,7 @@ class PacketBuilder:
 
         # header: {field: type}
         self.packets: Dict[str, Dict[str, chr]] = {}
-        self.init_packets()
-
-    def init_packets(self) -> None:
-        pass
+        self.packets = self._get_conf_dict()
 
     def build_from_header(self, header: str) -> Packet:
         """Builds an empty packet with only empty fields.
@@ -36,21 +36,10 @@ class PacketBuilder:
         :rtype: Packet
         """
         new_pack = self.build_from_header(header)
-        new_pack.set_fields(**self.fields_from_raw(header, raw))
+        fields = dict(zip(self.fields_of(header),
+                      struct.unpack(">" + self.format_of(header), raw)))
+        new_pack.set_fields(**fields)
         return new_pack
-
-    def fields_from_raw(self, header: str, raw: bytes) -> Dict[str, Any]:
-        """Returns the fields and values of the packet from raw bytes.
-
-        :param header: the header of the packet
-        :type header: str
-        :param raw: the raw bytes of the packet body
-        :type raw: bytes
-        :return: the fields and values of the packet
-        :rtype: Dict[str, Any]
-        """
-        return dict(zip(self.fields_of(header),
-                        struct.unpack(self.format_of(header), raw)))
 
     def size_of(self, header: str) -> int:
         """Returns the number of bytes the packet has.
@@ -70,7 +59,7 @@ class PacketBuilder:
         :return: the format of the packet
         :rtype: str
         """
-        return self.packets[header]["format"]
+        return "".join(self.packets[header].values())
 
     def fields_of(self, header: str) -> List[str]:
         """Returns the fields of the packet.
@@ -81,3 +70,22 @@ class PacketBuilder:
         :rtype: List[str]
         """
         return self.packets[header].keys()
+
+    def _get_conf_dict(self) -> dict[str, dict[str, chr]]:
+        """Returns a dictionary of all packet's stractures from the
+         parsed packet configs.
+
+        :return: a dictionary of all packet's stractures
+        :rtype: dict[str, dict[str, chr]]
+        """
+        general_dict = {}  # A dictionary of all packet's stractures.
+        # Go over all of the files and connectes thier packet structures into
+        # one dictionary.
+        for filename in os.listdir(self.packet_directory):
+            if filename.endswith(".packet"):
+                conf_yaml = open(self.packet_directory + '\\' + filename, "r")
+                yaml_data = yaml.load(conf_yaml, Loader=yaml.FullLoader)
+                conf_yaml.close()
+                general_dict.update(yaml_data)
+
+        return general_dict

@@ -2,6 +2,7 @@ package RIONet.socket_utils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 public class StructUtils {
 
@@ -38,7 +39,7 @@ public class StructUtils {
                     result[i] = buffer.getShort(0);
                     pos += 2;
                     break;
-                case 's': // string
+                case 's': // string // TODO: str pack/unpack incompatible
                     StringBuilder s = new StringBuilder();
 
                     while (raw[pos] != (byte) 0x00) {
@@ -74,6 +75,7 @@ public class StructUtils {
     public static byte[] pack(String format, Object[] data) {
         format = parseFormat(format);
         int size = sizeOf(format);
+        System.out.println(size);
 
         System.out.println(format);
 
@@ -81,21 +83,37 @@ public class StructUtils {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         buffer.order(ByteOrder.BIG_ENDIAN);
 
-        for (int i = 0; i < format.length(); i++) {
-            switch (format.charAt(i)) {
+        int data_index = 0; // could be special cases (such as string packing/unpacking)
+        // that require an offset between format and data
+        for (int format_index = 0; format_index < format.length(); format_index++) {
+            System.out.println(format.charAt(format_index) + data[data_index].toString());
+            switch (format.charAt(format_index)) {
                 case 'c':
-                    buffer.putChar((Character) data[i]);
+                    buffer.putChar((char) data[data_index]);
+                    data_index++;
                     break;
                 case 'h':
-                    buffer.putShort((Short) data[i]);
+                    buffer.putShort((short) data[data_index]);
+                    data_index++;
                     break;
-                case 's': // TODO: implement string packing
+                case 's':
+                    String dataString = ((String) data[data_index]);
+                    // write me code that returns the first char of dataString into a utf8 char:
+
+
+                    if (dataString.length() > 0)
+                        buffer.put(Character.toString(dataString.charAt(0)).getBytes(StandardCharsets.UTF_8)[0]);
+                        data[data_index] = dataString.substring(1);
+
+                    if (dataString.length() == 0) data_index++;
                     break;
                 case 'd':
-                    buffer.putDouble((Double) data[i]);
+                    buffer.putDouble((double) data[data_index]);
+                    data_index++;
                     break;
                 case 'i':
-                    buffer.putInt((Integer) data[i]);
+                    buffer.putInt((int) data[data_index]);
+                    data_index++;
                     break;
             }
         }

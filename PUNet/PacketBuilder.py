@@ -12,8 +12,8 @@ class PacketBuilder:
         self.packet_directory = packet_directory
 
         # header: {field: type}
-        self.packets: Dict[str, Dict[str, chr]] = {}
-        self.packets = self._get_conf_dict()
+        self.packet_schemes: Dict[str, Dict[str, chr]] = {}
+        self.packet_schemes = self._get_conf_dict()
 
     def build_from_header(self, header: str) -> Packet:
         """Builds an empty packet with only empty fields.
@@ -59,7 +59,7 @@ class PacketBuilder:
         :return: the format of the packet
         :rtype: str
         """
-        return "".join(self.packets[header].values())
+        return "".join(self.packet_schemes[header].values())
 
     def fields_of(self, header: str) -> List[str]:
         """Returns the fields of the packet.
@@ -69,7 +69,7 @@ class PacketBuilder:
         :return: the fields of the packet
         :rtype: List[str]
         """
-        return self.packets[header].keys()
+        return self.packet_schemes[header].keys()
 
     def _get_conf_dict(self) -> dict[str, dict[str, chr]]:
         """Returns a dictionary of all packet's stractures from the

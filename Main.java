@@ -9,10 +9,17 @@ import RIONet.PacketBuilder;
 
 public class Main { // TODO implement logging
         public static void main(String[] args) {
-                listener();
+                // listener();
                 // sender();
-                // String format = "3c0fff5t";
-                // System.out.println(StructUtils.parseFormat(format));
+
+                PacketBuilder builder = new PacketBuilder("packets");
+                Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
+                packet.setField("ifield1", 2);
+                packet.setField("dfield2", 4.8);
+                System.out.println(packet);
+                byte[] ser = packet.serialize();
+                Packet packet2 = builder.buildFromRaw("EXAMPLE_PACKET", ser);
+                System.out.println(packet2);
         }
 
         public static void sender() {

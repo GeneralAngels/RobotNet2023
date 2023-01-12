@@ -50,7 +50,7 @@ def sender():
 
 def tests():
     builder: PacketBuilder = PacketBuilder("packets")
-    print(builder.packets)
+    print(builder.packet_schemes)
     new_pack: Packet = builder.build_from_header(
         "EXAMPLE_PACKET"
     )

@@ -7,10 +7,10 @@ import java.util.HashMap;
 
 public class PacketBuilder {
     // header to fields and types
-    private final HashMap<String, HashMap<String, Character>> packets;
+    private final HashMap<String, HashMap<String, Character>> packetSchemes;
 
     public PacketBuilder(String packet_directory) {
-        packets = parsePacketDirectory(packet_directory);
+        packetSchemes = parsePacketDirectory(packet_directory);
     }
 
     /**
@@ -52,7 +52,7 @@ public class PacketBuilder {
      * @return the format of the packet
      */
     public String formatOf(String header) {
-        HashMap<String, Character> fields = packets.get(header);
+        HashMap<String, Character> fields = packetSchemes.get(header);
         String format = "";
         for (Character type : fields.values()) {
             format += type;
@@ -66,7 +66,7 @@ public class PacketBuilder {
      * @return the fields of the packet
      */
     public String[] fieldsOf(String header) {
-        return packets.get(header).keySet().toArray(new String[0]);
+        return packetSchemes.get(header).keySet().toArray(new String[0]);
     }
 
     /**
@@ -75,7 +75,13 @@ public class PacketBuilder {
      * @return the parsed packet directory
      */
     private HashMap<String, HashMap<String, Character>> parsePacketDirectory(String packet_directory) {
+        HashMap<String, HashMap<String, Character>> packets = new HashMap<>();
+        packets.put("EXAMPLE_PACKET", new HashMap<String, Character>());
+        packets.get("EXAMPLE_PACKET").put("ifield1", 'i');
+        packets.get("EXAMPLE_PACKET").put("dfield2", 'd');
+
+        return packets;
         // TODO implement packet directory parsing
-        return null;
+        // return null;
     }
 }

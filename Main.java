@@ -1,3 +1,4 @@
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.Thread;
 import java.util.Arrays;
@@ -14,14 +15,29 @@ public class Main {
                 // listener();
                 // sender();
 
-                // PacketBuilder builder = new PacketBuilder("packets");
-                // Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
-                // packet.setField("ifield1", 2);
-                // packet.setField("dfield2", 4.8);
-                // System.out.println(packet);
-                // byte[] ser = packet.serialize();
-                // Packet packet2 = builder.buildFromRaw("EXAMPLE_PACKET", ser);
-                // System.out.println(packet2);
+                PacketBuilder builder = new PacketBuilder("packets");
+                Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
+                packet.setField("ifield1", 2);
+                packet.setField("dfield2", 4.8);
+                System.out.println(packet);
+                byte[] ser = packet.serialize();
+                System.out.println(Arrays.toString(ser));
+
+                DataInputStream dis = new DataInputStream(new java.io.ByteArrayInputStream(ser));
+                try {
+                        short header_length = (short) StructUtils.unpack("h", dis.readNBytes(2))[0];
+                        System.out.println(header_length);
+                        String header = (String) StructUtils.unpack(header_length + "s",
+                                        dis.readNBytes(header_length))[0];
+                        System.out.println(header);
+
+                        byte[] rest = dis.readNBytes(builder.sizeOf(header));
+                        System.out.println(Arrays.toString(rest));
+                        Packet packet2 = builder.buildFromRaw(header, rest);
+                        System.out.println(packet2);
+                } catch (Exception e) {
+                        // TODO: handle exception
+                }
         }
 
         public static void sender() {

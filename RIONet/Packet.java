@@ -1,5 +1,6 @@
 package RIONet;
 
+import java.util.Arrays;
 import java.util.HashMap;
 
 import RIONet.socket_utils.StructUtils;
@@ -51,11 +52,16 @@ public class Packet {
      */
     public byte[] serialize() {
         String complete_format = String.format("h%ds" + format, header.length());
-        Object[] packArray = new Object[] {
-                (short) header.length(),
-                header,
-                data.values().toArray()
-        };
+        Object[] packArray = new Object[2 + data.size()];
+        packArray[0] = (short) header.length();
+        packArray[1] = header;
+        Object[] values = data.values().toArray();
+        for (int i = 0; i < data.size(); i++) {
+            packArray[i + 2] = values[i];
+        }
+
+        System.out.println(complete_format);
+        System.out.println(Arrays.toString(packArray));
 
         return StructUtils.pack(complete_format, packArray);
     }

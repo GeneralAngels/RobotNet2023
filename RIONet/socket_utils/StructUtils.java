@@ -19,7 +19,7 @@ public class StructUtils {
      * @throws StructError if the format doesnt match the data given
      * @return an object array ordered by the given format
      */
-    public static Object[] unpack(String format, byte[] raw) {
+    public static Object[] unpack(String format, byte... raw) {
         ArrayList<FormatPart> genFormat = generalizeFormat(format);
 
         Object[] result = new Object[unpackLength(genFormat)];
@@ -182,20 +182,30 @@ public class StructUtils {
      * @param format the format
      * @return the generalized format
      */
-    private static ArrayList<FormatPart> generalizeFormat(String format) {
+    public static ArrayList<FormatPart> generalizeFormat(String format) {
         ArrayList<FormatPart> result = new ArrayList<>();
         int tempC1 = 1;
         int tempC2 = 1;
 
         char tempS = ' '; // null char
 
+        boolean lastWasNumber = false;
+
         for (char current : format.toCharArray()) {
             if (Character.isDigit(current)) {
+                int v = Character.getNumericValue(current);
                 if (tempS == ' ') {
-                    tempC1 = Character.getNumericValue(current);
+                    if (lastWasNumber)
+                        tempC1 = tempC1 * 10 + v;
+                    else
+                        tempC1 = v;
                 } else {
-                    tempC2 = Character.getNumericValue(current);
+                    if (lastWasNumber)
+                        tempC2 = tempC2 * 10 + v;
+                    else
+                        tempC2 = v;
                 }
+                lastWasNumber = true;
             } else {
                 if (tempS == ' ') {
                     tempS = current;
@@ -220,6 +230,7 @@ public class StructUtils {
                         }
                     }
                 }
+                lastWasNumber = false;
             }
         }
         result.add(new FormatPart(tempC1, format.charAt(format.length() - 1)));

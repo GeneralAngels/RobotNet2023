@@ -1,8 +1,13 @@
 package RIONet.socket_utils;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class StructUtils {
 
@@ -11,54 +16,51 @@ public class StructUtils {
      *
      * @param format the format to unpack by
      * @param raw    the byte array
+     * @throws StructError if the format doesnt match the data given
      * @return an object array ordered by the given format
      */
     public static Object[] unpack(String format, byte[] raw) {
-        format = parseFormat(format);
-        Object[] result = new Object[format.length()];
+        ArrayList<FormatPart> genFormat = generalizeFormat(format);
 
-        int pos = 0;
+        Object[] result = new Object[unpackLength(genFormat)];
 
-        for (int i = 0; i < format.length(); i++) {
-            char type = format.charAt(i);
+        ByteArrayInputStream bis = new ByteArrayInputStream(raw);
+        DataInputStream dis = new DataInputStream(bis);
 
-            switch (type) {
-                case 'x': // pad type
-                    pos += 1;
-                    break;
-                case 'c': // char
-                    result[i] = (char) raw[pos];
-                    pos += 1;
-                    break;
-                case 'h': // short
-                    ByteBuffer buffer = ByteBuffer.allocate(2);
-                    buffer.order(ByteOrder.BIG_ENDIAN);
-                    buffer.put(raw[pos]);
-                    buffer.put(raw[pos + 1]);
+        for (int i = 0; i < genFormat.size(); i++) {
+            char c = genFormat.get(i).getType();
+            int count = genFormat.get(i).getCount();
 
-                    result[i] = buffer.getShort(0);
-                    pos += 2;
-                    break;
-                case 's': // string // TODO: str pack/unpack incompatible
-                    StringBuilder s = new StringBuilder();
-
-                    while (raw[pos] != (byte) 0x00) {
-                        char chr = (char) raw[pos];
-                        s.append(chr);
-                        pos += 1;
-                    }
-                    result[i] = s.toString();
-                    break;
-                case 'd': // double
-                    buffer = ByteBuffer.allocate(8);
-                    buffer.order(ByteOrder.BIG_ENDIAN);
-                    for (int k = 0; i < 8; i++) {
-                        buffer.put(raw[pos + k]);
-                    }
-
-                    result[i] = buffer.getDouble();
-                    pos += 8;
-                    break;
+            try {
+                switch (c) {
+                    case 'c': // char, utf-8
+                        result[i] = (char) dis.readByte();
+                        break;
+                    case 'h': // short
+                        result[i] = dis.readShort();
+                        break;
+                    case 's': // string
+                        byte[] utf8Bytes = new byte[count];
+                        dis.read(utf8Bytes);
+                        result[i] = new String(utf8Bytes, StandardCharsets.UTF_8);
+                        break;
+                    case 'd': // double
+                        result[i] = dis.readDouble();
+                        break;
+                    case 'i': // int
+                        result[i] = dis.readInt();
+                        break;
+                    case 'l': // long
+                        result[i] = dis.readLong();
+                        break;
+                    case 'f': // float
+                        result[i] = dis.readFloat();
+                        break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassCastException e) {
+                throw new StructError("format doesnt match data given");
             }
         }
 
@@ -73,58 +75,65 @@ public class StructUtils {
      * @return byte array of the data
      */
     public static byte[] pack(String format, Object[] data) {
-        format = parseFormat(format);
-        int size = sizeOf(format);
-        System.out.println(size);
+        ArrayList<FormatPart> genFormat = generalizeFormat(format);
 
-        System.out.println(format);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        DataOutputStream os = new DataOutputStream(bos);
 
-        byte[] bytes = new byte[size];
-        ByteBuffer buffer = ByteBuffer.wrap(bytes);
-        buffer.order(ByteOrder.BIG_ENDIAN);
+        int data_index = 0;
+        for (FormatPart part : genFormat) {
+            char c = part.getType();
+            int count = part.getCount();
 
-        int data_index = 0; // could be special cases (such as string packing/unpacking)
-        // that require an offset between format and data
-        for (int format_index = 0; format_index < format.length(); format_index++) {
-            System.out.println(format.charAt(format_index) + data[data_index].toString());
-            switch (format.charAt(format_index)) {
-                case 'c':
-                    buffer.putChar((char) data[data_index]);
-                    data_index++;
-                    break;
-                case 'h':
-                    buffer.putShort((short) data[data_index]);
-                    data_index++;
-                    break;
-                case 's':
-                    String dataString = ((String) data[data_index]);
-                    // write me code that returns the first char of dataString into a utf8 char:
-
-
-                    if (dataString.length() > 0)
-                        buffer.put(Character.toString(dataString.charAt(0)).getBytes(StandardCharsets.UTF_8)[0]);
-                        data[data_index] = dataString.substring(1);
-
-                    if (dataString.length() == 0) data_index++;
-                    break;
-                case 'd':
-                    buffer.putDouble((double) data[data_index]);
-                    data_index++;
-                    break;
-                case 'i':
-                    buffer.putInt((int) data[data_index]);
-                    data_index++;
-                    break;
+            try {
+                switch (c) {
+                    case 'c':
+                        for (int j = 0; j < count; j++) {
+                            os.write((char) data[data_index]);
+                            data_index++;
+                        }
+                        break;
+                    case 'h':
+                        for (int j = 0; j < count; j++) {
+                            os.writeShort((short) data[data_index]);
+                            data_index++;
+                        }
+                        break;
+                    case 's':
+                        os.write(((String) data[data_index]).getBytes(StandardCharsets.UTF_8));
+                        data_index++;
+                        break;
+                    case 'd':
+                        for (int j = 0; j < count; j++) {
+                            os.writeDouble((double) data[data_index]);
+                            data_index++;
+                        }
+                        break;
+                    case 'i':
+                        for (int j = 0; j < count; j++) {
+                            os.writeInt((int) data[data_index]);
+                            data_index++;
+                        }
+                        break;
+                    case 'l':
+                        for (int j = 0; j < count; j++) {
+                            os.writeLong((long) data[data_index]);
+                            data_index++;
+                        }
+                        break;
+                    case 'f':
+                        for (int j = 0; j < count; j++) {
+                            os.writeFloat((float) data[data_index]);
+                            data_index++;
+                        }
+                        break;
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
 
-        // Retrieve all bytes in the buffer
-        buffer.clear();
-        bytes = new byte[buffer.capacity()];
-
-        // transfer bytes from this buffer into the given destination array
-        buffer.get(bytes, 0, bytes.length);
-        return bytes;
+        return bos.toByteArray();
     }
 
     /**
@@ -134,29 +143,31 @@ public class StructUtils {
      * @return the estimated size of the format in bytes
      */
     public static int sizeOf(String format) {
-        format = parseFormat(format);
         int size = 0;
-        char[] chars = format.toCharArray();
 
-        for (char c : chars) {
+        ArrayList<FormatPart> genFormat = generalizeFormat(format);
+        for (FormatPart part : genFormat) {
+            char c = part.getType();
+            int count = part.getCount();
+
             switch (c) {
                 case 'c':
                 case 's':
-                    size += 1; // char, string (same as py)
+                    size += count * 1; // char, string utf-8
                     break;
 
                 case 'h':
-                    size += 2; // short
+                    size += count * 2; // short
                     break;
 
                 case 'i':
                 case 'f':
-                    size += 4; // int, float
+                    size += count * 4; // int, float
                     break;
 
                 case 'l':
                 case 'd':
-                    size += 8; // long, double
+                    size += count * 8; // long, double
                     break;
             }
         }
@@ -164,33 +175,107 @@ public class StructUtils {
     }
 
     /**
-     * Takes a format with numbers and parses it into one without numbers.
-     * ie: 'i3cd' -> 'icccd'
-     * @param format the unparsed format
-     * @return the parsed format
+     * Takes a format and generalizes it so it can be used for easier packing and
+     * unpacking.
+     * ie: 'i3cdd' -> '1i3c2d'
+     * 
+     * @param format the format
+     * @return the generalized format
      */
-    public static String parseFormat(String format) {
-        String newFormat = "";
-        int multiplier = -1;
-        for (int i = 0; i < format.length(); i++) {
-            char curr = format.charAt(i);
-            if (curr == '1' | curr == '2' | curr == '3' | curr == '4' | curr == '5' | curr == '6' | curr == '7' | curr == '8' | curr == '9' | curr == '0') {
-                if (multiplier == -1)
-                    multiplier = Character.getNumericValue(curr);
-                else
-                    multiplier = multiplier * 10 + Character.getNumericValue(curr);
+    private static ArrayList<FormatPart> generalizeFormat(String format) {
+        ArrayList<FormatPart> result = new ArrayList<>();
+        int tempC1 = 1;
+        int tempC2 = 1;
+
+        char tempS = ' '; // null char
+
+        for (char current : format.toCharArray()) {
+            if (Character.isDigit(current)) {
+                if (tempS == ' ') {
+                    tempC1 = Character.getNumericValue(current);
+                } else {
+                    tempC2 = Character.getNumericValue(current);
+                }
+            } else {
+                if (tempS == ' ') {
+                    tempS = current;
+                } else {
+                    if (current == 's') { // s -> tempC2/1 + s
+                        result.add(new FormatPart(tempC1, tempS));
+                        result.add(new FormatPart(tempC2, current));
+                        tempC1 = 1;
+                        tempC2 = 1;
+                        tempS = ' ';
+                    } else { // is a non s char
+                        if (current == tempS) { // last letter = current letter -> tempC1 += tempC2, tempS = current
+                            tempC1 += tempC2;
+                            tempC2 = 1;
+                            tempS = current;
+                        } else { // last letter != current letter -> tempC1 + tempS, tempC1 = tempC2, tempS =
+                                 // current
+                            result.add(new FormatPart(tempC1, tempS));
+                            tempC1 = tempC2;
+                            tempC2 = 1;
+                            tempS = current;
+                        }
+                    }
+                }
             }
+        }
+        result.add(new FormatPart(tempC1, format.charAt(format.length() - 1)));
 
-            else {
-                if (multiplier == -1)
-                    newFormat += curr;
+        return result;
+    }
 
-                else
-                    newFormat += new String(new char[multiplier]).replace('\0', curr);
-                multiplier = -1;
+    /**
+     * rerurns the length of the data that will be unpacked
+     * 
+     * @param format the generalized format of the data
+     * @return the length of the data
+     */
+    private static int unpackLength(ArrayList<FormatPart> format) {
+        int count = 0;
+        for (FormatPart part : format)
+            count += part.objCount();
+        return count;
+    }
+
+    /**
+     * A class that represents a part of a format.
+     * a part is a type and its number of occurences in a row.
+     */
+    private static class FormatPart {
+        private int count;
+        private char type;
+
+        public FormatPart(int count, char type) {
+            this.count = count;
+            this.type = type;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public char getType() {
+            return type;
+        }
+
+        /**
+         * returns the number of objects that will be unpacked
+         * 
+         * @return the number of objects that will be unpacked
+         */
+        public int objCount() {
+            if (type == 's') {
+                return 1;
+            } else {
+                return count;
             }
         }
 
-        return newFormat;
+        public String toString() {
+            return count + " " + type;
+        }
     }
 }

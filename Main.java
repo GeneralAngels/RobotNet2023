@@ -1,25 +1,27 @@
 import java.io.IOException;
 import java.lang.Thread;
+import java.util.Arrays;
 
 import RIONet.socket_handlers.SenderSocket;
 import RIONet.socket_handlers.SocketHandlerException;
 import RIONet.thread_handlers.ListenerThread;
 import RIONet.Packet;
 import RIONet.PacketBuilder;
+import RIONet.socket_utils.StructUtils;
 
-public class Main { // TODO implement logging
+public class Main {
         public static void main(String[] args) {
                 // listener();
                 // sender();
 
-                PacketBuilder builder = new PacketBuilder("packets");
-                Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
-                packet.setField("ifield1", 2);
-                packet.setField("dfield2", 4.8);
-                System.out.println(packet);
-                byte[] ser = packet.serialize();
-                Packet packet2 = builder.buildFromRaw("EXAMPLE_PACKET", ser);
-                System.out.println(packet2);
+                // PacketBuilder builder = new PacketBuilder("packets");
+                // Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
+                // packet.setField("ifield1", 2);
+                // packet.setField("dfield2", 4.8);
+                // System.out.println(packet);
+                // byte[] ser = packet.serialize();
+                // Packet packet2 = builder.buildFromRaw("EXAMPLE_PACKET", ser);
+                // System.out.println(packet2);
         }
 
         public static void sender() {
@@ -50,7 +52,8 @@ public class Main { // TODO implement logging
 
                         try {
                                 Thread.sleep(1000);
-                        } catch (InterruptedException e) {}
+                        } catch (InterruptedException e) {
+                        }
                 }
 
         }
@@ -64,7 +67,8 @@ public class Main { // TODO implement logging
                                 listenerThread = new ListenerThread(6666, builder);
                                 System.out.println("started listener");
                         } catch (IOException e) {
-                                System.out.println("An error has accured while trying to start a socket on port 6666" + e);
+                                System.out.println(
+                                                "An error has accured while trying to start a socket on port 6666" + e);
                         }
                 }
 

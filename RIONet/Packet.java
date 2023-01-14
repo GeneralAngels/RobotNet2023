@@ -1,6 +1,5 @@
 package RIONet;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import RIONet.socket_utils.StructUtils;
@@ -15,7 +14,7 @@ public class Packet {
     private final String format;
     private final String header;
 
-    public Packet(String header, String format, String... fields){
+    public Packet(String header, String format, String... fields) {
         this.header = header;
         this.format = format;
         data = new HashMap<String, Object>();
@@ -24,37 +23,38 @@ public class Packet {
         }
     }
 
-    public void setField(String field, Object value){
+    public void setField(String field, Object value) {
         data.put(field, value);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getField(String field){
-        return (T)data.get(field);
+    public <T> T getField(String field) {
+        return (T) data.get(field);
     }
 
-    public String getHeader(){
+    public String getHeader() {
         return header;
     }
 
-    public String getFormat(){
+    public String getFormat() {
         return format;
     }
 
-    public String toString(){
+    public String toString() {
         return header + " " + format + " " + data.toString();
     }
 
     /**
      * serializes the packet into a packed struct byte array
+     * 
      * @return the serialized packet
      */
-    public byte[] serialize(){
+    public byte[] serialize() {
         String complete_format = String.format("h%ds" + format, header.length());
         Object[] packArray = new Object[] {
-            (short) header.length(),
-            header,
-            data.values().toArray()
+                (short) header.length(),
+                header,
+                data.values().toArray()
         };
 
         return StructUtils.pack(complete_format, packArray);

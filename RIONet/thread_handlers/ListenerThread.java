@@ -22,7 +22,9 @@ public class ListenerThread extends Thread {
         lock = new ReentrantLock();
         packetQueue = new LinkedList<Packet>();
         listenerSocket = new ListenerSocket(port, packetBuilder);
+    }
 
+    public void accept() throws IOException {
         listenerSocket.accept();
     }
 
@@ -49,7 +51,7 @@ public class ListenerThread extends Thread {
      * get the next packet from the recieved packet queue
      *
      * @return a Packet from the threads packet queue, returns null if
-     * the queue is empty
+     *         the queue is empty
      */
     public Packet getPacket() {
         lock.lock();

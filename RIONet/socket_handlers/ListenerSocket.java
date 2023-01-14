@@ -8,7 +8,6 @@ import java.net.ServerSocket;
 import RIONet.Packet;
 import RIONet.PacketBuilder;
 
-
 public class ListenerSocket { // TODO implement multiple clients connection
 
     private ServerSocket serverSocket;
@@ -38,10 +37,7 @@ public class ListenerSocket { // TODO implement multiple clients connection
         if (clientSocket == null)
             throw new SocketHandlerException("Must first astablish a connection to sender before recieving data!");
 
-        short headerLength = inStream.readShort();
         String header = inStream.readUTF();
-
-        System.out.println("got header: " + header);
 
         byte[] raw_body = new byte[packetBuilder.sizeOf(header)];
         inStream.readFully(raw_body);

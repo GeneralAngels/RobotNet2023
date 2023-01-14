@@ -12,32 +12,8 @@ import RIONet.socket_utils.StructUtils;
 
 public class Main {
         public static void main(String[] args) {
-                // listener();
-                // sender();
-
-                PacketBuilder builder = new PacketBuilder("packets");
-                Packet packet = builder.buildFromHeader("EXAMPLE_PACKET");
-                packet.setField("ifield1", 2);
-                packet.setField("dfield2", 4.8);
-                System.out.println(packet);
-                byte[] ser = packet.serialize();
-                System.out.println(Arrays.toString(ser));
-
-                DataInputStream dis = new DataInputStream(new java.io.ByteArrayInputStream(ser));
-                try {
-                        short header_length = (short) StructUtils.unpack("h", dis.readNBytes(2))[0];
-                        System.out.println(header_length);
-                        String header = (String) StructUtils.unpack(header_length + "s",
-                                        dis.readNBytes(header_length))[0];
-                        System.out.println(header);
-
-                        byte[] rest = dis.readNBytes(builder.sizeOf(header));
-                        System.out.println(Arrays.toString(rest));
-                        Packet packet2 = builder.buildFromRaw(header, rest);
-                        System.out.println(packet2);
-                } catch (Exception e) {
-                        // TODO: handle exception
-                }
+                listener();
+                sender();
         }
 
         public static void sender() {
@@ -80,15 +56,25 @@ public class Main {
                 ListenerThread listenerThread = null;
                 while (listenerThread == null) {
                         try {
+                                System.out.println("creating listener");
                                 listenerThread = new ListenerThread(6666, builder);
-                                System.out.println("started listener");
+                                System.out.println("created listener");
                         } catch (IOException e) {
                                 System.out.println(
                                                 "An error has accured while trying to start a socket on port 6666" + e);
                         }
                 }
 
+                try {
+                        listenerThread.accept();
+                } catch (IOException e) {
+                        System.out.println(
+                                        "An error has accured while trying to accept client connection on port 6666"
+                                                        + e);
+                }
+
                 listenerThread.start();
+                System.out.println("started listener");
 
                 while (true) {
                         Packet packet = listenerThread.getPacket();

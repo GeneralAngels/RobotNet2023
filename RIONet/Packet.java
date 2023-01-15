@@ -47,7 +47,7 @@ public class Packet {
 
     /**
      * serializes the packet into a packed struct byte array
-     * 
+     *
      * @return the serialized packet
      */
     public byte[] serialize() {
@@ -59,9 +59,6 @@ public class Packet {
         for (int i = 0; i < data.size(); i++) {
             packArray[i + 2] = values[i];
         }
-
-        System.out.println(complete_format);
-        System.out.println(Arrays.toString(packArray));
 
         return StructUtils.pack(complete_format, packArray);
     }

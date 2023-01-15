@@ -1,17 +1,17 @@
 package RIONet.socket_handlers;
 
 import java.net.Socket;
+
+import RIONet.packets.Packet;
+
 import java.io.IOException;
 import java.io.DataOutputStream;
-
-import RIONet.Packet;
 
 public class SenderSocket {
     private Socket sock;
     private DataOutputStream outStream;
 
-    public SenderSocket() {
-    }
+    public SenderSocket() {}
 
     /**
      * connects the sender to a listener on the given ip and port

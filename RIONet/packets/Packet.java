@@ -1,6 +1,5 @@
-package RIONet;
+package RIONet.packets;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import RIONet.socket_utils.StructUtils;
@@ -15,6 +14,12 @@ public class Packet {
     private final String format;
     private final String header;
 
+    /**
+     * Create a new packet, should only be called by a PacketBuilder
+     * @param header the header of the packet
+     * @param format the format of the packet
+     * @param fields the fields of the packet
+     */
     public Packet(String header, String format, String... fields) {
         this.header = header;
         this.format = format;
@@ -24,12 +29,31 @@ public class Packet {
         }
     }
 
-    public void setField(String field, Object value) {
+    /**
+     * Sets a field in the packet
+     * @param field the field to set
+     * @param value the value to set the field to
+     * @throws IllegalArgumentException if the field does not exist in the packet
+     */
+    public void setField(String field, Object value) throws IllegalArgumentException {
+        if (!data.containsKey(field)) {
+            throw new IllegalArgumentException("Field " + field + " does not exist in packet " + header);
+        }
         data.put(field, value);
     }
 
+    /**
+     * Gets a field from the packet
+     * @param <T> the type of the field
+     * @param field the field to get
+     * @return the value of the field
+     * @throws IllegalArgumentException if the field does not exist in the packet
+     */
     @SuppressWarnings("unchecked")
-    public <T> T getField(String field) {
+    public <T> T getField(String field) throws IllegalArgumentException {
+        if (!data.containsKey(field)) {
+            throw new IllegalArgumentException("Field " + field + " does not exist in packet " + header);
+        }
         return (T) data.get(field);
     }
 
@@ -47,7 +71,6 @@ public class Packet {
 
     /**
      * serializes the packet into a packed struct byte array
-     * 
      * @return the serialized packet
      */
     public byte[] serialize() {
@@ -59,9 +82,6 @@ public class Packet {
         for (int i = 0; i < data.size(); i++) {
             packArray[i + 2] = values[i];
         }
-
-        System.out.println(complete_format);
-        System.out.println(Arrays.toString(packArray));
 
         return StructUtils.pack(complete_format, packArray);
     }

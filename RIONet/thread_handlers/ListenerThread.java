@@ -6,11 +6,12 @@ import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
 import RIONet.socket_handlers.ListenerSocket;
-import RIONet.socket_handlers.SocketHandlerException;
-import RIONet.Packet;
-import RIONet.PacketBuilder;
+import RIONet.packets.Packet;
+import RIONet.packets.PacketBuilder;
 
-/** Add your docs here. */
+/**
+ * A thread that listens for incoming packets from a sender and adds them to a queue
+ */
 public class ListenerThread extends Thread {
 
     private Queue<Packet> packetQueue;
@@ -18,12 +19,22 @@ public class ListenerThread extends Thread {
 
     ReentrantLock lock;
 
+    /**
+     * create a new listener thread
+     * @param port the port to listen on
+     * @param packetBuilder the packet builder to use to build packets
+     * @throws IOException if an error occurs while creating the listener socket
+     */
     public ListenerThread(int port, PacketBuilder packetBuilder) throws IOException {
         lock = new ReentrantLock();
         packetQueue = new LinkedList<Packet>();
         listenerSocket = new ListenerSocket(port, packetBuilder);
     }
 
+    /**
+     * accept a connection from a single sender
+     * @throws IOException if an error occurs while accepting the connection
+     */
     public void accept() throws IOException {
         listenerSocket.accept();
     }
@@ -41,8 +52,6 @@ public class ListenerThread extends Thread {
                 }
             } catch (IOException e) {
                 System.out.println("An error accured while recieving data from sender: " + e);
-            } catch (SocketHandlerException e) {
-                System.out.println(e);
             }
         }
     }

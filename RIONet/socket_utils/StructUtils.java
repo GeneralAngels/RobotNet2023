@@ -7,7 +7,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class StructUtils {
 
@@ -16,10 +15,14 @@ public class StructUtils {
      *
      * @param format the format to unpack by
      * @param raw    the byte array
-     * @throws StructError if the format doesnt match the data given
      * @return an object array ordered by the given format
+     * @throws StructError if the format doesnt match the data given
+     * @throws StructError if the format is invalid
      */
     public static Object[] unpack(String format, byte... raw) {
+        if (!validateFormat(format)) {
+            throw new StructError("invalid format");
+        }
         ArrayList<FormatPart> genFormat = generalizeFormat(format);
 
         Object[] result = new Object[unpackLength(genFormat)];
@@ -73,8 +76,12 @@ public class StructUtils {
      * @param format the format to pack data by
      * @param data   the data to pack
      * @return byte array of the data
+     * @throws StructError if the format is invalid
      */
     public static byte[] pack(String format, Object[] data) {
+        if (!validateFormat(format)) {
+            throw new StructError("invalid format");
+        }
         ArrayList<FormatPart> genFormat = generalizeFormat(format);
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -141,8 +148,13 @@ public class StructUtils {
      *
      * @param format a struct format
      * @return the estimated size of the format in bytes
+     * @throws StructError if the format is invalid
      */
     public static int sizeOf(String format) {
+        if (!validateFormat(format)) {
+            throw new StructError("invalid format");
+        }
+
         int size = 0;
 
         ArrayList<FormatPart> genFormat = generalizeFormat(format);
@@ -178,11 +190,11 @@ public class StructUtils {
      * Takes a format and generalizes it so it can be used for easier packing and
      * unpacking.
      * ie: 'i3cdd' -> '1i3c2d'
-     * 
+     *
      * @param format the format
      * @return the generalized format
      */
-    public static ArrayList<FormatPart> generalizeFormat(String format) {
+    private static ArrayList<FormatPart> generalizeFormat(String format) {
         ArrayList<FormatPart> result = new ArrayList<>();
         int tempC1 = 1;
         int tempC2 = 1;
@@ -239,8 +251,8 @@ public class StructUtils {
     }
 
     /**
-     * rerurns the length of the data that will be unpacked
-     * 
+     * returns the length of the data that will be unpacked
+     *
      * @param format the generalized format of the data
      * @return the length of the data
      */
@@ -249,6 +261,16 @@ public class StructUtils {
         for (FormatPart part : format)
             count += part.objCount();
         return count;
+    }
+
+    /**
+     * returns whether the format is valid or not.
+     * a valid format is a string that only contains the struct format chars and the number of times they occur.
+     * @param format the format to validate
+     * @return whether the format is valid or not
+     */
+    public static boolean validateFormat(String format) {
+        return format.matches("([0-9]*[cshidlfs])+");
     }
 
     /**

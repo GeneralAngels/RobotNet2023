@@ -7,7 +7,17 @@ class Packet:
     A packet should only be created using a PacketBuilder.
     """
     def __init__(self, header: str, fmt: str,
-                 *fields: Any) -> None:
+                 *fields: str) -> None:
+        """
+        Creates a new packet.
+
+        :param header: the header of the packet
+        :type header: str
+        :param fmt: the struct format of the packet
+        :type fmt: str
+        :param fields: the fields of the packet
+        :type fields: str
+        """
         self.header = header
         self.fmt = fmt
         self.data: Dict[str, Any] = {field: None for field in fields}

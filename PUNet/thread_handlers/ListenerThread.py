@@ -15,10 +15,8 @@ class ListenerThread(Thread):
         """
         :param port: the port to listen on
         :type port: int
-        :param local: whether to run the listener on localhost
-        :type local: bool
-        :param daemon: whether to run the thread as daemon
-        :type daemon: bool
+        :param packet_builder: the packet builder to use
+        :type packet_builder: PacketBuilder
         """
         super().__init__()
         self.listener_socket: ListenerSocket = ListenerSocket(

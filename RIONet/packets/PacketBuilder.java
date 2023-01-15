@@ -1,14 +1,21 @@
-package RIONet;
+package RIONet.packets;
 
 import RIONet.socket_utils.StructUtils;
 
 import java.util.HashMap;
 
-
+/**
+ * Used to build packets according to their config files
+ * A packet should only be created using a PacketBuilder
+ */
 public class PacketBuilder {
     // header to fields and types
     private final HashMap<String, HashMap<String, Character>> packetSchemes;
 
+    /**
+     * Creates a new packet builder from a packet directory
+     * @param packet_directory the packet directory
+     */
     public PacketBuilder(String packet_directory) {
         packetSchemes = parsePacketDirectory(packet_directory);
     }
@@ -17,8 +24,12 @@ public class PacketBuilder {
      * Builds an empty packet from a header
      * @param header the header of the packet
      * @return the packet
+     * @throws IllegalArgumentException if the header does not exist in the packet directory
      */
-    public Packet buildFromHeader(String header) {
+    public Packet buildFromHeader(String header) throws IllegalArgumentException {
+        if (!packetSchemes.containsKey(header)) {
+            throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
+        }
         return new Packet(header, formatOf(header), fieldsOf(header));
     }
 
@@ -27,8 +38,12 @@ public class PacketBuilder {
      * @param header the header of the packet
      * @param raw_body the raw body of the packet
      * @return the packet
+     * @throws IllegalArgumentException if the header does not exist in the packet directory
      */
-    public Packet buildFromRaw(String header, byte[] raw_body) {
+    public Packet buildFromRaw(String header, byte[] raw_body) throws IllegalArgumentException {
+        if (!packetSchemes.containsKey(header)) {
+            throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
+        }
         Packet new_packet = buildFromHeader(header);
         Object[] body = StructUtils.unpack(formatOf(header), raw_body);
         for (int i = 0; i < body.length; i++) {
@@ -41,8 +56,12 @@ public class PacketBuilder {
      * Gets the number of bytes a packet will be from its header
      * @param header the header of the packet
      * @return the size of the packet
+     * @throws IllegalArgumentException if the header does not exist in the packet directory
      */
-    public int sizeOf(String header) {
+    public int sizeOf(String header) throws IllegalArgumentException {
+        if (!packetSchemes.containsKey(header)) {
+            throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
+        }
         return StructUtils.sizeOf(formatOf(header));
     }
 
@@ -50,8 +69,12 @@ public class PacketBuilder {
      * Gets the struct format of a packet from its header
      * @param header the header of the packet
      * @return the format of the packet
+     * @throws IllegalArgumentException if the header does not exist in the packet directory
      */
-    public String formatOf(String header) {
+    public String formatOf(String header) throws IllegalArgumentException {
+        if (!packetSchemes.containsKey(header)) {
+            throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
+        }
         HashMap<String, Character> fields = packetSchemes.get(header);
         String format = "";
         for (Character type : fields.values()) {
@@ -64,8 +87,12 @@ public class PacketBuilder {
      * Gets the fields of a packet from its header
      * @param header the header of the packet
      * @return the fields of the packet
+     * @throws IllegalArgumentException if the header does not exist in the packet directory
      */
-    public String[] fieldsOf(String header) {
+    public String[] fieldsOf(String header) throws IllegalArgumentException {
+        if (!packetSchemes.containsKey(header)) {
+            throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
+        }
         return packetSchemes.get(header).keySet().toArray(new String[0]);
     }
 
@@ -82,6 +109,7 @@ public class PacketBuilder {
 
         return packets;
         // TODO implement packet directory parsing
+        // TODO implement packet directory validation
         // return null;
     }
 }

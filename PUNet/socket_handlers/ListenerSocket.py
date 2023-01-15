@@ -14,8 +14,8 @@ class ListenerSocket:
         """
         :param port: the port to listen on
         :type port: int
-        :param local: whether to run the server on localhost
-        :type local: bool
+        :param packet_builder: the packet builder to use
+        :type packet_builder: PacketBuilder
         """
         self.server_socket: socket.socket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM

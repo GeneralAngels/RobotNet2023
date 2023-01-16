@@ -14,10 +14,12 @@ import org.GANet.packets.PacketBuilder;
  */
 public class ListenerThread extends Thread {
 
-    private Queue<Packet> packetQueue;
-    private ListenerSocket listenerSocket;
+    private final Queue<Packet> packetQueue;
+    private final ListenerSocket listenerSocket;
 
     ReentrantLock lock;
+
+    private boolean running;
 
     /**
      * create a new listener thread
@@ -40,7 +42,7 @@ public class ListenerThread extends Thread {
     }
 
     public void run() {
-        while (true) {
+        while (running) {
             try {
                 Packet packet = listenerSocket.getPacket();
                 lock.lock();
@@ -51,13 +53,13 @@ public class ListenerThread extends Thread {
                     lock.unlock();
                 }
             } catch (IOException e) {
-                System.out.println("An error accured while recieving data from sender: " + e);
+                running = false;
             }
         }
     }
 
     /**
-     * get the next packet from the recieved packet queue
+     * get the next packet from the received packet queue
      *
      * @return a Packet from the threads packet queue, returns null if
      *         the queue is empty
@@ -69,5 +71,9 @@ public class ListenerThread extends Thread {
         } finally {
             lock.unlock();
         }
+    }
+
+    public boolean isRunning() {
+        return running;
     }
 }

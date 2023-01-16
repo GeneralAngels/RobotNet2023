@@ -79,9 +79,7 @@ public class Packet {
         packArray[0] = (short) header.length();
         packArray[1] = header;
         Object[] values = data.values().toArray();
-        for (int i = 0; i < data.size(); i++) {
-            packArray[i + 2] = values[i];
-        }
+        System.arraycopy(values, 0, packArray, 2, values.length);
 
         return StructUtils.pack(complete_format, packArray);
     }

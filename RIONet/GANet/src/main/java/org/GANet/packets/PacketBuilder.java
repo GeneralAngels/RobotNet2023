@@ -82,11 +82,11 @@ public class PacketBuilder {
             throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
         }
         Map<String, Character> fields = packetSchemes.get(header);
-        String format = "";
+        StringBuilder format = new StringBuilder();
         for (Character type : fields.values()) {
-            format += type;
+            format.append(type);
         }
-        return format;
+        return format.toString();
     }
 
     /**
@@ -141,7 +141,6 @@ public class PacketBuilder {
                         Map<String, Character> innerMap = new HashMap<>();
                         for (Map.Entry<String, Object> innerEntry : ((Map<String, Object>) entry.getValue()).entrySet()) {
                             innerMap.put(innerEntry.getKey(), ((String) innerEntry.getValue()).charAt(0));
-
                         }
                         // Add the key-value pairs to the result map
                         result.put(key, innerMap);

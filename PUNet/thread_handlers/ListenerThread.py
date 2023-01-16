@@ -26,13 +26,17 @@ class ListenerThread(Thread):
 
         self.running = True
 
-    def run(self) -> None:
+    def accept(self) -> None:
+        """Accepts a connection from a single sender
+        """
         self.listener_socket.accept()
+
+    def run(self) -> None:
         while self.running:
             try:
                 self.data_queue.put(self.listener_socket.get_data())
             except socket.error as e:
-                print("Failed to recieve data from sender: " + e)
+                self.running = False
 
     def get_packet(self) -> Packet:
         """Retrieves a packet from the packet queue
@@ -41,3 +45,11 @@ class ListenerThread(Thread):
         :rtype: Packet
         """
         return self.data_queue.get()
+
+    def is_running(self) -> bool:
+        """Returns whether the thread is running
+
+        :return: whether the thread is running
+        :rtype: bool
+        """
+        return self.running

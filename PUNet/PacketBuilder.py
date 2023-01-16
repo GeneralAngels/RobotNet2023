@@ -28,7 +28,11 @@ class PacketBuilder:
         :type header: str
         :return: an empty packet
         :rtype: Packet
+        :raises ValueError: if the header is not found in the packet schemes
         """
+        if header not in self.packet_schemes:
+            raise ValueError(f"Header {header} not found in packet schemes.")
+
         return Packet(header, self.format_of(header), *self.fields_of(header))
 
     def build_from_raw(self, header: str, raw: bytes) -> Packet:
@@ -40,10 +44,20 @@ class PacketBuilder:
         :type raw: bytes
         :return: the built packet
         :rtype: Packet
+        :raises ValueError: if the header is not found in the packet schemes
+        :raises ValueError: if the packet has invalid data
         """
+        if header not in self.packet_schemes:
+            raise ValueError(f"Header {header} not found in packet schemes.")
+
         new_pack = self.build_from_header(header)
-        fields = dict(zip(self.fields_of(header),
-                      struct.unpack(">" + self.format_of(header), raw)))
+
+        try:
+            fields = dict(zip(self.fields_of(header),
+                              struct.unpack(">" + self.format_of(header), raw)))
+        except struct.error as e:
+            raise ValueError(f"Packet {header} has invalid raw data: {e}")
+
         new_pack.set_fields(**fields)
         return new_pack
 
@@ -54,7 +68,11 @@ class PacketBuilder:
         :type header: str
         :return: the number of bytes the packet has
         :rtype: int
+        :raises ValueError: if the header is not found in the packet schemes
         """
+        if header not in self.packet_schemes:
+            raise ValueError(f"Header {header} not found in packet schemes.")
+
         return struct.calcsize(self.format_of(header))
 
     def format_of(self, header: str) -> str:
@@ -64,7 +82,11 @@ class PacketBuilder:
         :type header: str
         :return: the format of the packet
         :rtype: str
+        :raises ValueError: if the header is not found in the packet schemes
         """
+        if header not in self.packet_schemes:
+            raise ValueError(f"Header {header} not found in packet schemes.")
+
         return "".join(self.packet_schemes[header].values())
 
     def fields_of(self, header: str) -> List[str]:
@@ -74,7 +96,11 @@ class PacketBuilder:
         :type header: str
         :return: the fields of the packet
         :rtype: List[str]
+        :raises ValueError: if the header is not found in the packet schemes
         """
+        if header not in self.packet_schemes:
+            raise ValueError(f"Header {header} not found in packet schemes.")
+
         return self.packet_schemes[header].keys()
 
     def _get_conf_dict(self) -> dict[str, dict[str, chr]]:

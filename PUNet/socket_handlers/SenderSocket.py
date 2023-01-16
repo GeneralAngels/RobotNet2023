@@ -9,6 +9,8 @@ class SenderSocket:
     Implements a client that sends data to listeners.
     """
     def __init__(self) -> None:
+        """Creates a new sender socket
+        """
         self.connected = False
         self.sock: socket.socket = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM

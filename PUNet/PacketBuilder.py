@@ -1,6 +1,5 @@
 from typing import Dict, List
 import struct
-
 import yaml
 import os
 
@@ -8,7 +7,14 @@ from PUNet.Packet import Packet
 
 
 class PacketBuilder:
+    """A class that builds packets according to their chemes defined in a config file in the given directory.
+    """
     def __init__(self, packet_directory: str) -> None:
+        """Creates a new packet builder.
+
+        :param packet_directory: the directory of the packets config files
+        :type packet_directory: str
+        """
         self.packet_directory = packet_directory
 
         # header: {field: type}
@@ -20,7 +26,7 @@ class PacketBuilder:
 
         :param header: the header of the packet
         :type header: str
-        :return: the empty packet
+        :return: an empty packet
         :rtype: Packet
         """
         return Packet(header, self.format_of(header), *self.fields_of(header))

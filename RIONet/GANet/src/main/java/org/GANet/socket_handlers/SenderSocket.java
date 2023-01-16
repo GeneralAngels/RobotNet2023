@@ -1,17 +1,18 @@
 package org.GANet.socket_handlers;
 
 import java.net.Socket;
+
 import java.io.IOException;
 import java.io.DataOutputStream;
 
-import org.GANet.Packet;
+import org.GANet.packets.Packet;
+import org.GANet.socket_handlers.SocketHandlerException;
 
 public class SenderSocket {
     private Socket sock;
     private DataOutputStream outStream;
 
-    public SenderSocket() {
-    }
+    public SenderSocket() {}
 
     /**
      * connects the sender to a listener on the given ip and port

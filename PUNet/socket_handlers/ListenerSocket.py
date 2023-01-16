@@ -8,7 +8,7 @@ from ..PacketBuilder import PacketBuilder
 
 class ListenerSocket:
     """A socket handler for listening for data.
-    Implements a server that listens for sender connections.
+    Implements a server that listens for sender connections on all network interfaces.
     """
     def __init__(self, port: int, packet_builder: PacketBuilder) -> None:
         """
@@ -22,7 +22,7 @@ class ListenerSocket:
         )
 
         self.client_socket: socket.socket
-        self.server_socket.bind(("127.0.0.1", port))
+        self.server_socket.bind(("0.0.0.0", port))
 
         self.packet_builder = packet_builder
 
@@ -37,15 +37,13 @@ class ListenerSocket:
         the packet will be wrapped around a Packet object.
         If there isnt an available packet on buffer it will wait for one.
 
-        :raises SockethandlerException:
-        if the listener didn't accept any clients,
-        it will raise an Exception
+        :raises SockethandlerException: if the listener didn't accept any clients
         :return: a single packet sent
         :rtype: Packet
         """
         if self.client_socket is not None:
             header_length = int.from_bytes(self.client_socket.recv(2), "big")
-            print("header length: " + str(header_length))
+
             # struct strings are all chars + empty byte
             raw_header = self.client_socket.recv(header_length)
             header: str = (
@@ -59,6 +57,6 @@ class ListenerSocket:
             )
         else:
             raise SockethandlerException(
-                "Must first astablish a connection \
-                to sender before recieving data!"
+                "Must first accept a connection \
+                from sender before recieving data!"
             )

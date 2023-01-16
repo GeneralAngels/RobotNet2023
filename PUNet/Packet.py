@@ -30,18 +30,40 @@ class Packet:
 
         :return: the serialized packet
         :rtype: str
+        :raises ValueError: if the packet has invalid data
         """
-        return struct.pack(
-            f">h{len(self.header)}s{self.fmt}",  # format
-            len(self.header), self.header.encode("utf-8"),  # header
-            *self.data.values()  # data
-        )
+
+        try :
+            return struct.pack(
+                f">h{len(self.header)}s{self.fmt}",  # format
+                len(self.header), self.header.encode("utf-8"),  # header
+                *self.data.values()  # data
+            )
+        except struct.error as e:
+            raise ValueError(f"Packet {self.header} has invalid data: {e}")
 
     def get_field(self, field: str) -> Any:
+        """Returns the value of the given field.
+
+        :param field: the field to get the value of
+        :type field: str
+        :return: the value of the field
+        :rtype: Any
+        :raises ValueError: if the field is not found in the packet
+        """
+        if field not in self.data:
+            raise ValueError(f"Field {field} not found in packet.")
+
         return self.data[field]
 
     def set_fields(self, **fields: Any) -> None:
+        """Sets the values of the given fields.
+
+        :raises ValueError: if a field is not found in the packet
+        """
         for field, new_value in fields.items():
+            if field not in self.data:
+                raise ValueError(f"Field {field} not found in packet.")
             self.data[field] = new_value
 
     def __str__(self) -> str:

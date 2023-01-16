@@ -32,8 +32,7 @@ class SenderSocket:
 
         :param data: the packet
         :type data: Packet
-        :raises SockethandlerException:
-        if the sender isn't connected to any listener
+        :raises SockethandlerException: if the sender isn't connected to any listener
         """
         if self.connected:
             self.sock.send(packet.serialize())

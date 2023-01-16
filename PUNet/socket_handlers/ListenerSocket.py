@@ -1,9 +1,9 @@
 import socket
 import struct
 
-from .SockethandlerException import SockethandlerException
-from ..Packet import Packet
-from ..PacketBuilder import PacketBuilder
+from PUNet.socket_handlers.SockethandlerException import SockethandlerException
+from PUNet.packets.Packet import Packet
+from PUNet.packets.PacketBuilder import PacketBuilder
 
 
 class ListenerSocket:

@@ -1,7 +1,7 @@
 import socket
 
-from PUNet.packets import Packet
-from PUNet.socket_handlers.SockethandlerException import SockethandlerException
+from ..packets import Packet
+from . import SockethandlerException
 
 
 class SenderSocket:

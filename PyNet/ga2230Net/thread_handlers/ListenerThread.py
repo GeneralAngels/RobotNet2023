@@ -31,6 +31,11 @@ class ListenerThread(Thread):
         """
         self.listener_socket.accept()
 
+    def listen(self, listen_count: int) -> None:
+        """Starts listening for sender connections
+        """
+        self.listener_socket.listen(listen_count)
+
     def run(self) -> None:
         while self.running:
             try:

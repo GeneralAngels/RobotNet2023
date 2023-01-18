@@ -73,7 +73,7 @@ class PacketBuilder:
         if header not in self.packet_schemes:
             raise ValueError(f"Header {header} not found in packet schemes.")
 
-        return struct.calcsize(self.format_of(header))
+        return struct.calcsize("=" + self.format_of(header))
 
     def format_of(self, header: str) -> str:
         """Returns the format of the packet struct.

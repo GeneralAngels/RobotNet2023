@@ -43,3 +43,23 @@ class SenderSocket:
 
     def is_connected(self) -> bool:
         return self.connected
+
+if __name__ == "__main__":
+    import argparse
+    from time import sleep
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("ip", nargs="?", help="The ip of the listener", type=str)
+    parser.add_argument("port", nargs="?", help="The port of the listener", type=int)
+    args = parser.parse_args()
+
+    sender = SenderSocket()
+
+    sender.connect(args.ip, int(args.port))
+
+    while True:
+        n = Packet("test")
+        sender.send_data(n)
+        print("sent" + str(n))
+
+        sleep(1)

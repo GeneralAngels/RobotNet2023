@@ -60,3 +60,20 @@ class ListenerSocket:
                 "Must first accept a connection \
                 from sender before recieving data!"
             )
+
+
+if __name__ == "__main__":
+    import argparse
+
+    from ..packets import PacketBuilder
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("port", nargs="?", help="The port to listen on", type=int)
+    args = parser.parse_args()
+
+    listener = ListenerSocket(args.port, PacketBuilder())
+
+    listener.accept()
+
+    while True:
+        print(listener.get_data())

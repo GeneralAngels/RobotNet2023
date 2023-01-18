@@ -3,7 +3,7 @@ import struct
 import yaml
 import os
 
-from PUNet.packets.Packet import Packet
+from . import Packet
 
 
 class PacketBuilder:

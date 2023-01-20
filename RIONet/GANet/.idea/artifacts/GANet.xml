@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="GANet">
-    <output-path>$PROJECT_DIR$/out/artifacts/GANet</output-path>
-    <root id="archive" name="GANet.jar">
-      <element id="module-output" name="GANet" />
-      <element id="library" level="project" name="yaml.snakeyaml" />
-    </root>
-  </artifact>
-</component>

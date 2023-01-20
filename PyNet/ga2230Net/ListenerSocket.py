@@ -38,7 +38,7 @@ class ListenerSocket:
         """
         self.server_socket.listen(listen_count)
 
-    def get_data(self) -> Packet:
+    def get_packet(self) -> Packet:
         """Gets a single packet sent from a sender.
         the packet will be wrapped around a Packet object.
         If there isnt an available packet on buffer it will wait for one.

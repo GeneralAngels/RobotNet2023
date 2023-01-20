@@ -39,7 +39,7 @@ class ListenerThread(Thread):
     def run(self) -> None:
         while self.running:
             try:
-                self.data_queue.put(self.listener_socket.get_data())
+                self.data_queue.put(self.listener_socket.get_packet())
             except socket.error as e:
                 self.running = False
 

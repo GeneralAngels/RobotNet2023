@@ -27,7 +27,7 @@ class SenderSocket:
         self.sock.connect((ip, port))
         self.connected = True
 
-    def send_data(self, packet: Packet) -> None:
+    def send_packet(self, packet: Packet) -> None:
         """Sends a packet to a the listener.
 
         :param data: the packet

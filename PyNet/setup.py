@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='ga2230Net',
+    name='ga2230net',
     version='1.0',
     description='A networking library made for python side networks',
     url="https://github.com/GeneralAngels/RobotNet2023",

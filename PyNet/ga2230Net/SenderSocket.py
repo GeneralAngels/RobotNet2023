@@ -1,7 +1,7 @@
 import socket
 
-from ..packets import Packet
-from . import SockethandlerException
+import Packet
+import SockethandlerException
 
 
 class SenderSocket:

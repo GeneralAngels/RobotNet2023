@@ -3,7 +3,7 @@ import struct
 import yaml
 import os
 
-from . import Packet
+import Packet
 
 
 class PacketBuilder:

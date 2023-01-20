@@ -2,9 +2,9 @@ from threading import Thread
 from queue import Queue
 import socket
 
-from ..socket_handlers.ListenerSocket import ListenerSocket
-from ..packets.Packet import Packet
-from ..packets.PacketBuilder import PacketBuilder
+from .ListenerSocket import ListenerSocket
+from .Packet import Packet
+from .PacketBuilder import PacketBuilder
 
 
 class ListenerThread(Thread):

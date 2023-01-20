@@ -3,9 +3,9 @@ import struct
 import select
 from typing import List
 
-from . import SockethandlerException
-from ..packets import Packet
-from ..packets import PacketBuilder
+import SockethandlerException
+import Packet
+import PacketBuilder
 
 
 class ListenerSocket:

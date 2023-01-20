@@ -25,11 +25,11 @@ public class SenderSocket {
     }
 
     /**
-     * sends data to the listener, the data must be wrapped around a DataObject
+     * sends a packet to the listener
      *
-     * @param data DataObject the data to send
+     * @param packet the packet to send
      */
-    public void sendData(Packet packet) throws IOException, SocketHandlerException {
+    public void sendPacket(Packet packet) throws IOException, SocketHandlerException {
         if (outStream == null)
             throw new SocketHandlerException("Must first astablish a connection to listener before sending!");
         outStream.write(packet.serialize());

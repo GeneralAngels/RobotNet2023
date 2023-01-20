@@ -27,7 +27,7 @@ public class ListenerSocket { // TODO implement multiple clients connection
     }
 
     /**
-     * accepts a sender connection
+     * accepts a single sender connection
      */
     public void accept() throws IOException {
         clientSocket = serverSocket.accept();

@@ -33,7 +33,7 @@ class Packet:
         :raises ValueError: if the packet has invalid data
         """
 
-        try :
+        try:
             return struct.pack(
                 f">h{len(self.header)}s{self.fmt}",  # format
                 len(self.header), self.header.encode("utf-8"),  # header

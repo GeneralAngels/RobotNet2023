@@ -7,7 +7,8 @@ import Packet
 
 
 class PacketBuilder:
-    """A class that builds packets according to their chemes defined in a config file in the given directory.
+    """A class that builds packets according to their chemes defined
+     in a packet config file in the given directory.
     """
     def __init__(self, packet_directory: str) -> None:
         """Creates a new packet builder.
@@ -54,7 +55,8 @@ class PacketBuilder:
 
         try:
             fields = dict(zip(self.fields_of(header),
-                              struct.unpack(">" + self.format_of(header), raw)))
+                              struct.unpack(">" + self.format_of(header),
+                                            raw)))
         except struct.error as e:
             raise ValueError(f"Packet {header} has invalid raw data: {e}")
 

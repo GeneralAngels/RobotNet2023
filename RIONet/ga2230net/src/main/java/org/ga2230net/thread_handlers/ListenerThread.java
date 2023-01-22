@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.ga2230net.socket_handlers.SocketType;
 import org.ga2230net.socket_handlers.ListenerSocket;
 import org.ga2230net.packets.Packet;
 import org.ga2230net.packets.PacketBuilder;
@@ -14,33 +13,21 @@ import org.ga2230net.packets.PacketBuilder;
  * A thread that listens for incoming packets from a sender and adds them to a queue
  */
 public class ListenerThread extends Thread {
-
     private final Queue<Packet> packetQueue;
     private final ListenerSocket listenerSocket;
-
-    ReentrantLock lock;
-
+    private final ReentrantLock lock;
     private boolean running;
 
     /**
      * create a new listener thread
      * @param port the port to listen on
      * @param builder the packet builder to use to build packets
-     * @param type the type of the listener
-     * @throws IOException if an error occurs while creating the listener socket
+     * @throws IOException if an error occurs while creating the listener sockets
      */
-    public ListenerThread(int port, PacketBuilder builder, SocketType type) throws IOException {
+    public ListenerThread(int port, PacketBuilder builder) throws IOException {
         lock = new ReentrantLock();
-        packetQueue = new LinkedList<Packet>();
-        listenerSocket = new ListenerSocket(port, builder, type);
-    }
-
-    /**
-     * accept a connection from a single sender
-     * @throws IOException if an error occurs while accepting the connection
-     */
-    public void accept() throws IOException {
-        listenerSocket.accept();
+        packetQueue = new LinkedList<>();
+        listenerSocket = new ListenerSocket(port, builder);
     }
 
     public void run() {

@@ -34,18 +34,20 @@ class ListenerSocket:
         :rtype: Packet
         """
 
-        raw_header_length = self.server_socket.recvfrom(2)[0]
+        raw_packet = self.server_socket.recvfrom(1024)[0]
 
-        header_length = int.from_bytes(raw_header_length, "big")
+        header_length = int.from_bytes(raw_packet[0:2], "big")
 
         # struct strings are all chars + empty byte
-        raw_header = self.server_socket.recvfrom(header_length)[0]
+        raw_header = raw_packet[2: 2 + header_length]
+
         header: str = (
             struct.unpack(f">{header_length}s", raw_header)[0]
         ).decode("utf-8")
 
+        body_start = 2 + header_length
         return self.packet_builder.build_from_raw(
-            header, self.server_socket.recvfrom(
-                self.packet_builder.size_of(header)
-            )[0]
+            header,
+            raw_packet[body_start: body_start +
+                       self.packet_builder.size_of(header)]
         )

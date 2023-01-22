@@ -1,6 +1,6 @@
 import socket
 
-from Packet import Packet
+from .Packet import Packet
 
 
 class SenderSocket:

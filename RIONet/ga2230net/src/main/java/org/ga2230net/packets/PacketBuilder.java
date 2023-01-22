@@ -2,6 +2,7 @@ package org.ga2230net.packets;
 
 import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.HashMap;
 import java.io.File;
@@ -111,7 +112,7 @@ public class PacketBuilder {
         // Create an instance of the SnakeYAML library
         Yaml yaml = new Yaml();
         // Create a new HashMap to store the result
-        Map<String, Map<String, Character>> result = new HashMap<>();
+        Map<String, Map<String, Character>> result = new LinkedHashMap<>();
 
         try {
             // Create a new File object representing the directory passed as a parameter
@@ -138,7 +139,7 @@ public class PacketBuilder {
                     // Iterate through the key-value pairs in the parsed file
                     for (Map.Entry<String, Object> entry : map.entrySet()) {
                         String key = entry.getKey();
-                        Map<String, Character> innerMap = new HashMap<>();
+                        Map<String, Character> innerMap = new LinkedHashMap<>();
                         for (Map.Entry<String, Object> innerEntry : ((Map<String, Object>) entry.getValue()).entrySet()) {
                             innerMap.put(innerEntry.getKey(), ((String) innerEntry.getValue()).charAt(0));
                         }

@@ -1,6 +1,8 @@
 package org.ga2230net.packets;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.ga2230net.socket_utils.StructUtils;
 
@@ -10,7 +12,7 @@ import org.ga2230net.socket_utils.StructUtils;
  * A packet should only be created using a PacketBuilder
  */
 public class Packet {
-    private final HashMap<String, Object> data;
+    private final LinkedHashMap<String, Object> data;
     private final String format;
     private final String header;
 
@@ -23,7 +25,7 @@ public class Packet {
     public Packet(String header, String format, String... fields) {
         this.header = header;
         this.format = format;
-        data = new HashMap<String, Object>();
+        data = new LinkedHashMap<>();
         for (String field : fields) {
             data.put(field, null);
         }
@@ -80,7 +82,8 @@ public class Packet {
         packArray[1] = header;
         Object[] values = data.values().toArray();
         System.arraycopy(values, 0, packArray, 2, values.length);
-
+        System.out.println(complete_format);
+        System.out.println(Arrays.toString(packArray));
         return StructUtils.pack(complete_format, packArray);
     }
 }

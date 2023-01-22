@@ -8,15 +8,15 @@ import java.io.IOException;
 import org.ga2230net.packets.Packet;
 
 public class SenderSocket {
-    private DatagramSocket datagramSocket = null;
+    private final DatagramSocket datagramSocket;
 
     private final int port;
     private final InetAddress listenerAddress;
 
-    public SenderSocket(String ip, int port) throws IOException {
-        this.port = port;
-        this.listenerAddress = InetAddress.getByName(ip);
-        datagramSocket = new DatagramSocket(port);
+    public SenderSocket(String listener_ip, int listener_port, int sender_port) throws IOException {
+        this.port = listener_port;
+        this.listenerAddress = InetAddress.getByName(listener_ip);
+        datagramSocket = new DatagramSocket(sender_port);
     }
 
     /**

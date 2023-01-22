@@ -1,7 +1,6 @@
 import socket
 
 from Packet import Packet
-import SockethandlerException
 
 
 class SenderSocket:
@@ -17,7 +16,7 @@ class SenderSocket:
         :type listener_port: int
         """
         self.sock: socket.socket = socket.socket(
-            socket.AF_INET, socket.SOCK_STREAM
+            socket.AF_INET, socket.SOCK_DGRAM
         )
         self.listener_address = (listener_ip, listener_port)
 

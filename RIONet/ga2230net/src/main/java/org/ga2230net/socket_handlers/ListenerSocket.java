@@ -6,12 +6,11 @@ import org.ga2230net.packets.PacketBuilder;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.nio.charset.StandardCharsets;
 
 public class ListenerSocket {
-    private DatagramSocket datagramSocket = null;
+    private final DatagramSocket datagramSocket;
     private final PacketBuilder builder;
-    private final DatagramPacket incomingHeader = new DatagramPacket(new byte[2], 2);
+    private final DatagramPacket rawPacket = new DatagramPacket(new byte[2048], 2048);
     public ListenerSocket(int port, PacketBuilder builder) throws IOException {
         this.builder = builder;
 
@@ -19,22 +18,14 @@ public class ListenerSocket {
     }
 
     public Packet getPacket() throws IOException, SocketHandlerException {
-        datagramSocket.receive(incomingHeader);
-        short headerLength = (short) ((short)(incomingHeader.getData()[0] & 0xFF) << 8 | (incomingHeader.getData()[1] & 0xFF));
+        datagramSocket.receive(rawPacket);
+        int headerLength = rawPacket.getData()[0] + rawPacket.getData()[1];
         byte[] rawHeader = new byte[headerLength];
-        DatagramPacket headerPack = new DatagramPacket(
-                new byte[headerLength],
-                headerLength
-        );
-
-        String header = new String(headerPack.getData(), StandardCharsets.UTF_8);
-
-        DatagramPacket bodyPack = new DatagramPacket(
-                new byte[builder.sizeOf(header)],
-                builder.sizeOf(header)
-        );
-
-        return builder.buildFromRaw(header, bodyPack.getData());
+        System.arraycopy(rawPacket.getData(), 2, rawHeader, 0, headerLength);
+        String header = new String(rawHeader);
+        byte[] rawBody = new byte[builder.sizeOf(header)];
+        System.arraycopy(rawPacket.getData(), 2 + headerLength, rawBody, 0, builder.sizeOf(header));
+        return builder.buildFromRaw(header, rawBody);
     }
 
 }

@@ -1,6 +1,5 @@
 package org.ga2230net.packets;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -82,8 +81,6 @@ public class Packet {
         packArray[1] = header;
         Object[] values = data.values().toArray();
         System.arraycopy(values, 0, packArray, 2, values.length);
-        System.out.println(complete_format);
-        System.out.println(Arrays.toString(packArray));
         return StructUtils.pack(complete_format, packArray);
     }
 }

@@ -1,37 +1,36 @@
 package org.ga2230net.socket_handlers;
 
-import java.net.Socket;
-
+import java.net.DatagramSocket;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 import java.io.IOException;
-import java.io.DataOutputStream;
 
 import org.ga2230net.packets.Packet;
 
 public class SenderSocket {
-    private Socket sock;
-    private DataOutputStream outStream;
+    private final DatagramSocket datagramSocket;
 
-    public SenderSocket() {}
+    private final int port;
+    private final InetAddress listenerAddress;
 
-    /**
-     * connects the sender to a listener on the given ip and port
-     *
-     * @param ip   the ip of the listener to connect to
-     * @param port the port of the listener to connect to
-     */
-    public void connect(String ip, int port) throws IOException {
-        sock = new Socket(ip, port);
-        outStream = new DataOutputStream(sock.getOutputStream());
+    public SenderSocket(String listener_ip, int listener_port, int sender_port) throws IOException {
+        this.port = listener_port;
+        this.listenerAddress = InetAddress.getByName(listener_ip);
+        datagramSocket = new DatagramSocket(sender_port);
     }
 
     /**
      * sends a packet to the listener
      *
      * @param packet the packet to send
+     * @throws IOException if there was a problem while sending the packet
      */
-    public void sendPacket(Packet packet) throws IOException, SocketHandlerException {
-        if (outStream == null)
-            throw new SocketHandlerException("Must first astablish a connection to listener before sending!");
-        outStream.write(packet.serialize());
+    public void sendPacket(Packet packet) throws IOException {
+        byte[] ser = packet.serialize();
+        DatagramPacket pack = new DatagramPacket(
+            ser, ser.length,
+            listenerAddress, port
+        );
+        datagramSocket.send(pack);
     }
 }

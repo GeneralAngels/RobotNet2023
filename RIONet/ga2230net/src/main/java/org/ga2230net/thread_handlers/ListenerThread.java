@@ -31,11 +31,12 @@ public class ListenerThread extends Thread {
     }
 
     public void run() {
+        running = true;
         while (running) {
             try {
                 Packet packet = listenerSocket.getPacket();
-                lock.lock();
 
+                lock.lock();
                 try {
                     packetQueue.add(packet);
                 } finally {

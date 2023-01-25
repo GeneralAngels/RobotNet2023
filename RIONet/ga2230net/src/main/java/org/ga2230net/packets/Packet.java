@@ -1,6 +1,5 @@
 package org.ga2230net.packets;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import org.ga2230net.socket_utils.StructUtils;

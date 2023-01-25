@@ -20,11 +20,11 @@ public class StructUtils {
      * @param format the format to unpack by
      * @param raw    the byte array
      * @return an object array ordered by the given format
-     * @throws StructError if the format doesnt match the data given
+     * @throws StructError if the format doesn't match the data given
      * @throws StructError if the format is invalid
      */
     public static Object[] unpack(String format, byte... raw) {
-        if (!validateFormat(format)) {
+        if (formatInvalid(format)) {
             throw new StructError("invalid format");
         }
         ArrayList<FormatPart> genFormat = generalizeFormat(format);
@@ -34,40 +34,60 @@ public class StructUtils {
         ByteArrayInputStream bis = new ByteArrayInputStream(raw);
         DataInputStream dis = new DataInputStream(bis);
 
-        for (int i = 0; i < genFormat.size(); i++) {
-            char c = genFormat.get(i).getType();
-            int count = genFormat.get(i).getCount();
+        int resIndex = 0;
+        for (FormatPart part: genFormat) {
+            char c = part.type();
+            int count = part.count();
 
             try {
                 switch (c) {
-                    case 'c': // char, utf-8
-                        result[i] = (char) dis.readByte();
-                        break;
-                    case 'h': // short
-                        result[i] = dis.readShort();
-                        break;
-                    case 's': // string
+                    case 'c' -> { // char, utf-8
+                        for (int i = 0; i < count; i++) {
+                            result[resIndex] = (char) dis.readByte();
+                            resIndex++;
+                        }
+                    }
+                    case 'h' -> { // short
+                        for (int i = 0; i < count; i++) {
+                            result[resIndex] = dis.readShort();
+                            resIndex++;
+                        }
+                    }
+                    case 's' -> { // string
                         byte[] utf8Bytes = new byte[count];
                         dis.read(utf8Bytes);
-                        result[i] = new String(utf8Bytes, StandardCharsets.UTF_8);
-                        break;
-                    case 'd': // double
-                        result[i] = dis.readDouble();
-                        break;
-                    case 'i': // int
-                        result[i] = dis.readInt();
-                        break;
-                    case 'l': // long
-                        result[i] = dis.readLong();
-                        break;
-                    case 'f': // float
-                        result[i] = dis.readFloat();
-                        break;
+                        result[resIndex] = new String(utf8Bytes, StandardCharsets.UTF_8);
+                        resIndex++;
+                    }
+                    case 'd' -> { // double
+                        for (int i = 0; i < count; i++) {
+                            result[resIndex] = dis.readDouble();
+                            resIndex++;
+                        }
+                    }
+                    case 'i' -> { // int
+                        for (int i = 0; i < count; i++) {
+                            result[resIndex] = dis.readInt();
+                            resIndex++;
+                        }
+                    }
+                    case 'l' -> { // long
+                        for (int i = 0; i < count; i++) {
+                            result[resIndex] = dis.readLong();
+                            resIndex++;
+                        }
+                    }
+                    case 'f' -> { // float
+                        for (int i = 0; i < count; i++) {
+                            result[resIndex] = dis.readFloat();
+                            resIndex++;
+                        }
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (ClassCastException e) {
-                throw new StructError("format doesnt match data given");
+                throw new StructError("format doesn't match data given");
             }
         }
 
@@ -83,7 +103,7 @@ public class StructUtils {
      * @throws StructError if the format is invalid
      */
     public static byte[] pack(String format, Object[] data) {
-        if (!validateFormat(format)) {
+        if (formatInvalid(format)) {
             throw new StructError("invalid format");
         }
         ArrayList<FormatPart> genFormat = generalizeFormat(format);
@@ -93,51 +113,51 @@ public class StructUtils {
 
         int data_index = 0;
         for (FormatPart part : genFormat) {
-            char c = part.getType();
-            int count = part.getCount();
+            char c = part.type();
+            int count = part.count();
 
             try {
                 switch (c) {
-                    case 'c':
+                    case 'c' -> {
                         for (int j = 0; j < count; j++) {
                             os.write((char) data[data_index]);
                             data_index++;
                         }
-                        break;
-                    case 'h':
+                    }
+                    case 'h' -> {
                         for (int j = 0; j < count; j++) {
                             os.writeShort((short) data[data_index]);
                             data_index++;
                         }
-                        break;
-                    case 's':
+                    }
+                    case 's' -> {
                         os.write(((String) data[data_index]).getBytes(StandardCharsets.UTF_8));
                         data_index++;
-                        break;
-                    case 'd':
+                    }
+                    case 'd' -> {
                         for (int j = 0; j < count; j++) {
                             os.writeDouble((double) data[data_index]);
                             data_index++;
                         }
-                        break;
-                    case 'i':
+                    }
+                    case 'i' -> {
                         for (int j = 0; j < count; j++) {
                             os.writeInt((int) data[data_index]);
                             data_index++;
                         }
-                        break;
-                    case 'l':
+                    }
+                    case 'l' -> {
                         for (int j = 0; j < count; j++) {
                             os.writeLong((long) data[data_index]);
                             data_index++;
                         }
-                        break;
-                    case 'f':
+                    }
+                    case 'f' -> {
                         for (int j = 0; j < count; j++) {
                             os.writeFloat((float) data[data_index]);
                             data_index++;
                         }
-                        break;
+                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -155,7 +175,7 @@ public class StructUtils {
      * @throws StructError if the format is invalid
      */
     public static int sizeOf(String format) {
-        if (!validateFormat(format)) {
+        if (formatInvalid(format)) {
             throw new StructError("invalid format");
         }
 
@@ -163,35 +183,21 @@ public class StructUtils {
 
         ArrayList<FormatPart> genFormat = generalizeFormat(format);
         for (FormatPart part : genFormat) {
-            char c = part.getType();
-            int count = part.getCount();
+            char c = part.type();
+            int count = part.count();
 
             switch (c) {
-                case 'c':
-                case 's':
-                    size += count * 1; // char, string utf-8
-                    break;
-
-                case 'h':
-                    size += count * 2; // short
-                    break;
-
-                case 'i':
-                case 'f':
-                    size += count * 4; // int, float
-                    break;
-
-                case 'l':
-                case 'd':
-                    size += count * 8; // long, double
-                    break;
+                case 'c', 's' -> size += count; // char, string utf-8
+                case 'h' -> size += count * 2; // short
+                case 'i', 'f' -> size += count * 4; // int, float
+                case 'l', 'd' -> size += count * 8; // long, double
             }
         }
         return size;
     }
 
     /**
-     * Takes a format and generalizes it so it can be used for easier packing and
+     * Takes a format and generalizes it, so it can be used for easier packing and
      * unpacking.
      * ie: 'i3cdd' -> '1i3c2d'
      *
@@ -235,15 +241,13 @@ public class StructUtils {
                     } else { // is a non s char
                         if (current == tempS) { // last letter = current letter -> tempC1 += tempC2, tempS = current
                             tempC1 += tempC2;
-                            tempC2 = 1;
-                            tempS = current;
                         } else { // last letter != current letter -> tempC1 + tempS, tempC1 = tempC2, tempS =
                                  // current
                             result.add(new FormatPart(tempC1, tempS));
                             tempC1 = tempC2;
-                            tempC2 = 1;
-                            tempS = current;
                         }
+                        tempC2 = 1;
+                        tempS = current;
                     }
                 }
                 lastWasNumber = false;
@@ -273,46 +277,31 @@ public class StructUtils {
      * @param format the format to validate
      * @return whether the format is valid or not
      */
-    public static boolean validateFormat(String format) {
-        return format.matches("([0-9]*[cshidlfs])+");
+    public static boolean formatInvalid(String format) {
+        return !format.matches("([0-9]*[cshidlf])+");
     }
 
     /**
-     * A class that represents a part of a format.
-     * a part is a type and its number of occurences in a row.
-     */
-    private static class FormatPart {
-        private int count;
-        private char type;
-
-        public FormatPart(int count, char type) {
-            this.count = count;
-            this.type = type;
-        }
-
-        public int getCount() {
-            return count;
-        }
-
-        public char getType() {
-            return type;
-        }
+         * A class that represents a part of a format.
+         * a part is a type and its number of its occurrences in a row.
+         */
+        private record FormatPart(int count, char type) {
 
         /**
          * returns the number of objects that will be unpacked
-         * 
+         *
          * @return the number of objects that will be unpacked
          */
-        public int objCount() {
-            if (type == 's') {
-                return 1;
-            } else {
-                return count;
+            public int objCount() {
+                if (type == 's') {
+                    return 1;
+                } else {
+                    return count;
+                }
+            }
+
+            public String toString() {
+                return count + " " + type;
             }
         }
-
-        public String toString() {
-            return count + " " + type;
-        }
-    }
 }

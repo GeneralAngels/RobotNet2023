@@ -67,4 +67,5 @@ class Packet:
             self.data[field] = new_value
 
     def __str__(self) -> str:
-        return self.header + str(self.data.items())
+
+        return self.header + "; " + str(self.data)

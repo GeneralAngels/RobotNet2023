@@ -22,7 +22,7 @@ class ListenerThread(Thread):
         self.listener_socket: ListenerSocket = ListenerSocket(
             port, packet_builder
         )
-        self.data_queue: "Queue[Packet]" = Queue()
+        self.packet_queue: "Queue[Packet]" = Queue()
 
         self.running = True
 
@@ -36,20 +36,29 @@ class ListenerThread(Thread):
         """
         self.listener_socket.listen(listen_count)
 
+#bolbol
+
     def run(self) -> None:
         while self.running:
             try:
-                self.data_queue.put(self.listener_socket.get_packet())
-            except socket.error as e:
+                self.packet_queue.put(self.listener_socket.get_packet())
+            except socket.error:
                 self.running = False
 
-    def get_packet(self) -> Packet:
-        """Retrieves a packet from the packet queue
+    def get_packet(self, num_of_packets: int) -> list[Packet]:
+        """Retrieves a list of packets from the packet queue
 
+        :param num_of_packets: the number of packets to retrieve
+        :type num_of_packets: int
         :return: a packet
         :rtype: Packet
         """
-        return self.data_queue.get()
+
+        lst_of_packets: list[Packet] = [
+            self.packet_queue.get() for _ in range(num_of_packets)
+            ]
+
+        return lst_of_packets
 
     def is_running(self) -> bool:
         """Returns whether the thread is running

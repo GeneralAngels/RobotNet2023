@@ -54,10 +54,14 @@ public class ListenerThread extends Thread {
      * @return a Packet from the threads packet queue, returns null if
      *         the queue is empty
      */
-    public Packet getPacket() {
+    public List[Packet] getPacket(int numOfPackets) {
         lock.lock();
         try {
-            return packetQueue.poll();
+            Packet[] packetList = new Packet[numOfPackets];
+            for(int i = 0; i < numOfPackets; i++){
+                packetList[i] = packetQueue.poll();
+            }
+            return packetListpac;
         } finally {
             lock.unlock();
         }

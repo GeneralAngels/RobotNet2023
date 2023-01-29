@@ -26,18 +26,6 @@ class ListenerThread(Thread):
 
         self.running = True
 
-    def accept(self) -> None:
-        """Accepts a connection from a single sender
-        """
-        self.listener_socket.accept()
-
-    def listen(self, listen_count: int) -> None:
-        """Starts listening for sender connections
-        """
-        self.listener_socket.listen(listen_count)
-
-#bolbol
-
     def run(self) -> None:
         while self.running:
             try:
@@ -56,7 +44,7 @@ class ListenerThread(Thread):
 
         lst_of_packets: list[Packet] = [
             self.packet_queue.get() for _ in range(num_of_packets)
-            ]
+        ]
 
         return lst_of_packets
 

@@ -29,7 +29,9 @@ class ListenerThread(Thread):
     def run(self) -> None:
         while self.running:
             try:
-                self.packet_queue.put(self.listener_socket.get_packet())
+                new_packet: Packet = self.listener_socket.get_packet()
+                with self.packet_queue.mutex:
+                    self.packet_queue.put(new_packet)
             except socket.error:
                 self.running = False
 
@@ -42,9 +44,10 @@ class ListenerThread(Thread):
         :rtype: Packet
         """
 
-        lst_of_packets: list[Packet] = [
-            self.packet_queue.get() for _ in range(num_of_packets)
-        ]
+        with self.packet_queue.mutex:
+            lst_of_packets: list[Packet] = [
+                self.packet_queue.get() for _ in range(num_of_packets)
+            ]
 
         return lst_of_packets
 

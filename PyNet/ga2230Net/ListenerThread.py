@@ -48,6 +48,12 @@ class ListenerThread(Thread):
 
         return lst_of_packets
 
+    def flush_packets_queue(self) -> None:
+        """Flushes the packet queue
+        """
+        with self.packet_queue.mutex:
+            self.packet_queue.queue.clear()
+
     def is_running(self) -> bool:
         """Returns whether the thread is running
 

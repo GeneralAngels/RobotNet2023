@@ -27,5 +27,4 @@ public class ListenerSocket {
         System.arraycopy(rawPacket.getData(), 2 + headerLength, rawBody, 0, builder.sizeOf(header));
         return builder.buildFromRaw(header, rawBody);
     }
-
 }

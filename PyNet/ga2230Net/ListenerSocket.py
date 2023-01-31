@@ -25,7 +25,7 @@ class ListenerSocket:
 
         self.packet_builder = packet_builder
 
-    def get_packet() -> Packet:
+    def get_packet(self) -> Packet:
         """Gets a single packet sent from a sender.
         the packet will be wrapped around a Packet object.
         If there isnt an available packet on buffer it will wait for one.

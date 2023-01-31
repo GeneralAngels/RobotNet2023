@@ -26,22 +26,12 @@ class ListenerThread(Thread):
 
         self.running = True
 
-    def accept(self) -> None:
-        """Accepts a connection from a single sender
-        """
-        self.listener_socket.accept()
-
-    def listen(self, listen_count: int) -> None:
-        """Starts listening for sender connections
-        """
-        self.listener_socket.listen(listen_count)
-
-#bolbol
-
     def run(self) -> None:
         while self.running:
             try:
-                self.packet_queue.put(self.listener_socket.get_packet())
+                new_packet: Packet = self.listener_socket.get_packet()
+                with self.packet_queue.mutex:
+                    self.packet_queue.put(new_packet)
             except socket.error:
                 self.running = False
 
@@ -54,11 +44,18 @@ class ListenerThread(Thread):
         :rtype: Packet
         """
 
-        lst_of_packets: list[Packet] = [
-            self.packet_queue.get() for _ in range(num_of_packets)
+        with self.packet_queue.mutex:
+            lst_of_packets: list[Packet] = [
+                self.packet_queue.get() for _ in range(num_of_packets)
             ]
 
         return lst_of_packets
+
+    def flush_packets_queue(self) -> None:
+        """Flushes the packet queue
+        """
+        with self.packet_queue.mutex:
+            self.packet_queue.queue.clear()
 
     def is_running(self) -> bool:
         """Returns whether the thread is running

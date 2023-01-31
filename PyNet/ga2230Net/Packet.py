@@ -39,8 +39,8 @@ class Packet:
                 len(self.header), self.header.encode("utf-8"),  # header
                 *self.data.values()  # data
             )
-        except struct.error as e:
-            raise ValueError(f"Packet {self.header} has invalid data: {e}")
+        except struct.error as struct_error:
+            raise ValueError(f"Packet {self.header} has invalid data: {struct_error}")
 
     def get_field(self, field: str) -> Any:
         """Returns the value of the given field.
@@ -67,4 +67,5 @@ class Packet:
             self.data[field] = new_value
 
     def __str__(self) -> str:
-        return self.header + str(self.data.items())
+
+        return self.header + "; " + str(self.data)

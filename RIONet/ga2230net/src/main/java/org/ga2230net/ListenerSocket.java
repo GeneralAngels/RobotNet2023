@@ -1,7 +1,4 @@
-package org.ga2230net.socket_handlers;
-
-import org.ga2230net.packets.Packet;
-import org.ga2230net.packets.PacketBuilder;
+package org.ga2230net;
 
 import java.io.IOException;
 import java.net.DatagramPacket;

@@ -1,12 +1,8 @@
-package org.ga2230net.thread_handlers;
+package org.ga2230net;
 
 import java.io.IOException;
 import java.util.PriorityQueue;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.ga2230net.socket_handlers.ListenerSocket;
-import org.ga2230net.packets.Packet;
-import org.ga2230net.packets.PacketBuilder;
 
 /**
  * A thread that listens for incoming packets from a sender and adds them to a queue
@@ -48,12 +44,12 @@ public class ListenerThread extends Thread {
     }
 
     /**
-     * get the next packet from the received packet queue
+     * get the next n packets from the received packets queue
      *
-     * @return a Packet from the threads packet queue, returns null if
+     * @return a Packet array from the threads packet queue, returns null if
      *         the queue is empty
      */
-    public Packet[] getPacket(int numOfPackets) {
+    public Packet[] getPackets(int numOfPackets) {
         lock.lock();
         try {
             Packet[] packets = new Packet[numOfPackets];
@@ -66,6 +62,25 @@ public class ListenerThread extends Thread {
         }
     }
 
+    /**
+     * @return an array of all packets left in the packet queue
+     */
+    public Packet[] getAllPackets() {
+        lock.lock();
+        try {
+            Packet[] packets = new Packet[packetQueue.size()];
+            for(int i = 0; i < packetQueue.size(); i++){
+                packets[i] = packetQueue.poll();
+            }
+            return packets;
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
+     * flushes the packet queue and thus deleting all packets in it
+     */
     public void flushPacketsQueue() {
         lock.lock();
         try {

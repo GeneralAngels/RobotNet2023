@@ -1,4 +1,4 @@
-package org.ga2230net.socket_utils;
+package org.ga2230net;
 
 public class StructError extends RuntimeException {
     public StructError(String message) {

@@ -1,4 +1,4 @@
-package org.ga2230net.socket_utils;
+package org.ga2230net;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -55,7 +55,7 @@ public class StructUtils {
                     }
                     case 's' -> { // string
                         byte[] utf8Bytes = new byte[count];
-                        dis.read(utf8Bytes);
+                        int ignored = dis.read(utf8Bytes);
                         result[resIndex] = new String(utf8Bytes, StandardCharsets.UTF_8);
                         resIndex++;
                     }

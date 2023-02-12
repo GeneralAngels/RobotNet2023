@@ -1,4 +1,4 @@
-package org.ga2230net.packets;
+package org.ga2230net;
 
 import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
@@ -7,8 +7,6 @@ import java.util.Map;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-
-import org.ga2230net.socket_utils.StructUtils;
 
 /**
  * Used to build packets according to their config files

@@ -1,11 +1,9 @@
-package org.ga2230net.socket_handlers;
+package org.ga2230net;
 
 import java.net.DatagramSocket;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.io.IOException;
-
-import org.ga2230net.packets.Packet;
 
 public class SenderSocket {
     private final DatagramSocket datagramSocket;

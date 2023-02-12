@@ -1,6 +1,7 @@
 from threading import Thread
 from queue import Queue
 import socket
+from typing import List
 
 from .ListenerSocket import ListenerSocket
 from .Packet import Packet
@@ -35,21 +36,24 @@ class ListenerThread(Thread):
             except socket.error:
                 self.running = False
 
-    def get_packet(self, num_of_packets: int) -> list[Packet]:
-        """Retrieves a list of packets from the packet queue
+    def get_packets(self, num_of_packets: int = None) -> list[Packet]:
+        """Retrieves a list of packets from the packet queue.
+        Returns all packets if a number wasnt specified.
 
         :param num_of_packets: the number of packets to retrieve
         :type num_of_packets: int
         :return: a packet
         :rtype: Packet
         """
+        if num_of_packets is None:
+            num_of_packets = len(self.packet_queue)
 
         with self.packet_queue.mutex:
-            lst_of_packets: list[Packet] = [
+            packets: list[Packet] = [
                 self.packet_queue.get() for _ in range(num_of_packets)
             ]
 
-        return lst_of_packets
+        return packets
 
     def flush_packets_queue(self) -> None:
         """Flushes the packet queue

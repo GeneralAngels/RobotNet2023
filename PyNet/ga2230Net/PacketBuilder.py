@@ -2,8 +2,17 @@ from typing import Dict, List
 import struct
 import yaml
 import os
+from dataclasses import dataclass
 
 from .Packet import Packet
+
+
+@dataclass
+class Packet_Representation:
+    header: str
+    fields: List[str]
+    fmt: str
+    single_instance: bool
 
 
 class PacketBuilder:
@@ -18,9 +27,8 @@ class PacketBuilder:
         """
         self.packet_directory = packet_directory
 
-        # header: {field: type}
-        self.packet_schemes: Dict[str, Dict[str, chr]] = {}
-        self.packet_schemes = self._get_conf_dict()
+        self.packet_schemes: Dict[str, Packet_Representation] = {}
+        self.packet_schemes = self._parse_packet_configs()
 
     def build_from_header(self, header: str) -> Packet:
         """Builds an empty packet with only empty fields.
@@ -34,7 +42,10 @@ class PacketBuilder:
         if header not in self.packet_schemes:
             raise ValueError(f"Header {header} not found in packet schemes.")
 
-        return Packet(header, self.format_of(header), *self.fields_of(header))
+        return Packet(header,
+                      self.packet_schemes[header].fmt,
+                      self.packet_schemes[header].single_instance,
+                      *self.packet_schemes[header].fields)
 
     def build_from_raw(self, header: str, raw: bytes) -> Packet:
         """Builds a packet from raw bytes.
@@ -89,7 +100,7 @@ class PacketBuilder:
         if header not in self.packet_schemes:
             raise ValueError(f"Header {header} not found in packet schemes.")
 
-        return "".join(self.packet_schemes[header].values())
+        return self.packet_schemes[header].fmt
 
     def fields_of(self, header: str) -> List[str]:
         """Returns the fields of the packet.
@@ -103,14 +114,13 @@ class PacketBuilder:
         if header not in self.packet_schemes:
             raise ValueError(f"Header {header} not found in packet schemes.")
 
-        return self.packet_schemes[header].keys()
+        return self.packet_schemes[header].fields
 
-    def _get_conf_dict(self) -> dict[str, dict[str, chr]]:
-        """Returns a dictionary of all packet's stractures from the
-         parsed packet configs.
+    def _parse_packet_configs(self) -> dict[str, Packet_Representation]:
+        """Returns a dictionary of all packet representations to their header.
 
         :return: a dictionary of all packet's stractures
-        :rtype: dict[str, dict[str, chr]]
+        :rtype: dict[str, Packet_Representation]
         """
         general_dict = {}  # A dictionary of all packet's stractures.
         # Go over all of the files and connectes thier packet structures into
@@ -120,6 +130,17 @@ class PacketBuilder:
                 conf_yaml = open(self.packet_directory + '\\' + filename, "r")
                 yaml_data = yaml.load(conf_yaml, Loader=yaml.FullLoader)
                 conf_yaml.close()
-                general_dict.update(yaml_data)
+
+                header = next(iter(yaml_data))
+                fields = list(yaml_data[header].keys())
+                single_instance = False
+                if "single_instance" in fields:
+                    single_instance = yaml_data[header]["single_instance"]
+                    fields.remove("single_instance")
+                fmt = "".join(yaml_data[header][field] for field in fields)
+
+                rep = Packet_Representation(header, fields, fmt,
+                                            single_instance)
+                general_dict.update({header: rep})
 
         return general_dict

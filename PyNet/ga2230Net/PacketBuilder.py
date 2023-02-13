@@ -28,7 +28,7 @@ class PacketBuilder:
         self.packet_directory = packet_directory
 
         self.packet_schemes: Dict[str, Packet_Representation] = {}
-        self.packet_schemes = self._parse_packet_configs()
+        self.packet_schemes = self._parse_packet_directory()
 
     def build_from_header(self, header: str) -> Packet:
         """Builds an empty packet with only empty fields.
@@ -116,7 +116,7 @@ class PacketBuilder:
 
         return self.packet_schemes[header].fields
 
-    def _parse_packet_configs(self) -> dict[str, Packet_Representation]:
+    def _parse_packet_directory(self) -> dict[str, Packet_Representation]:
         """Returns a dictionary of all packet representations to their header.
 
         :return: a dictionary of all packet's stractures

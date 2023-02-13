@@ -11,16 +11,19 @@ public class Packet {
     private final LinkedHashMap<String, Object> data;
     private final String format;
     private final String header;
+    private final boolean singleInstance;
 
     /**
      * Create a new packet, should only be called by a PacketBuilder
      * @param header the header of the packet
      * @param format the format of the packet
+     * @param singleInstance whether the packet is of single instance kind
      * @param fields the fields of the packet
      */
-    public Packet(String header, String format, String... fields) {
+    public Packet(String header, String format, boolean singleInstance, String... fields) {
         this.header = header;
         this.format = format;
+        this.singleInstance = singleInstance;
         data = new LinkedHashMap<>();
         for (String field : fields) {
             data.put(field, null);
@@ -61,6 +64,10 @@ public class Packet {
 
     public String getFormat() {
         return format;
+    }
+
+    public boolean isSingleInstance() {
+        return singleInstance;
     }
 
     public String toString() {

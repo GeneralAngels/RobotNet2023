@@ -30,13 +30,7 @@ public class ListenerThread extends Thread {
         while (running) {
             try {
                 Packet packet = listenerSocket.getPacket();
-
-                lock.lock();
-                try {
-                    packetQueue.add(packet);
-                } finally {
-                    lock.unlock();
-                }
+                addPacket(packet);
             } catch (IOException e) {
                 running = false;
             }
@@ -65,7 +59,7 @@ public class ListenerThread extends Thread {
     /**
      * @return an array of all packets left in the packet queue
      */
-    public Packet[] getAllPackets() {
+    public Packet[] getPackets() {
         lock.lock();
         try {
             Packet[] packets = new Packet[packetQueue.size()];
@@ -92,5 +86,22 @@ public class ListenerThread extends Thread {
 
     public boolean isRunning() {
         return running;
+    }
+
+    private void addPacket(Packet packet) {
+        lock.lock();
+        try {
+            if (packet.isSingleInstance()) {
+                for (Packet p: packetQueue) {
+                    if (p.getHeader().equals(packet.getHeader())) {
+                        packetQueue.remove(p);
+                        break;
+                    }
+                }
+            }
+            packetQueue.add(packet);
+        } finally {
+            lock.unlock();
+        }
     }
 }

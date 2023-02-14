@@ -138,6 +138,7 @@ public class PacketBuilder {
                     // Iterate through the key-value pairs in the parsed file
                     for (Map.Entry<String, Object> entry : map.entrySet()) {
 
+                        // create a new packet entry
                         String header = entry.getKey();
                         StringBuilder fmt = new StringBuilder();
                         ArrayList<String> fields = new ArrayList<>();
@@ -162,7 +163,6 @@ public class PacketBuilder {
             e.printStackTrace();
         }
         // return the result map
-        System.out.println(result);
         return result;
     }
 }

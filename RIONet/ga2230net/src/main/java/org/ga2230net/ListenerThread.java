@@ -1,14 +1,15 @@
 package org.ga2230net;
 
 import java.io.IOException;
-import java.util.PriorityQueue;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A thread that listens for incoming packets from a sender and adds them to a queue
  */
 public class ListenerThread extends Thread {
-    private final PriorityQueue<Packet> packetQueue;
+    private final Queue<Packet> packetQueue;
     private final ListenerSocket listenerSocket;
     private final ReentrantLock lock;
     private boolean running;
@@ -21,7 +22,7 @@ public class ListenerThread extends Thread {
      */
     public ListenerThread(int port, PacketBuilder builder) throws IOException {
         lock = new ReentrantLock();
-        packetQueue = new PriorityQueue<>();
+        packetQueue = new LinkedList<>();
         listenerSocket = new ListenerSocket(port, builder);
     }
 
@@ -32,6 +33,7 @@ public class ListenerThread extends Thread {
                 Packet packet = listenerSocket.getPacket();
                 addPacket(packet);
             } catch (IOException e) {
+                e.printStackTrace();
                 running = false;
             }
         }
@@ -63,7 +65,7 @@ public class ListenerThread extends Thread {
         lock.lock();
         try {
             Packet[] packets = new Packet[packetQueue.size()];
-            for(int i = 0; i < packetQueue.size(); i++){
+            for(int i = 0; i < packets.length; i++){
                 packets[i] = packetQueue.poll();
             }
             return packets;

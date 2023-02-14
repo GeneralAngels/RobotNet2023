@@ -6,7 +6,7 @@ class Packet:
     """A Type for all packets, holds a header and struct format.
     A packet should only be created using a PacketBuilder.
     """
-    def __init__(self, header: str, fmt: str,
+    def __init__(self, header: str, fmt: str, single_instance: bool = False,
                  *fields: str) -> None:
         """
         Creates a new packet.
@@ -15,11 +15,14 @@ class Packet:
         :type header: str
         :param fmt: the struct format of the packet
         :type fmt: str
+        :param single_instance: whether the packet is a single instance packet
+        :type single_instance: bool
         :param fields: the fields of the packet
         :type fields: str
         """
         self.header = header
         self.fmt = fmt
+        self.single_instance = single_instance
         self.data: Dict[str, Any] = {field: None for field in fields}
 
     def serialize(self) -> bytes:
@@ -40,7 +43,8 @@ class Packet:
                 *self.data.values()  # data
             )
         except struct.error as struct_error:
-            raise ValueError(f"Packet {self.header} has invalid data: {struct_error}")
+            raise ValueError(f"Packet {self.header} has invalid data: \
+                             {struct_error}")
 
     def get_field(self, field: str) -> Any:
         """Returns the value of the given field.
@@ -52,7 +56,7 @@ class Packet:
         :raises ValueError: if the field is not found in the packet
         """
         if field not in self.data:
-            raise ValueError(f"Field {field} not found in packet.")
+            raise ValueError(f"Field {field} not found in packet {self.header}.")
 
         return self.data[field]
 
@@ -63,9 +67,16 @@ class Packet:
         """
         for field, new_value in fields.items():
             if field not in self.data:
-                raise ValueError(f"Field {field} not found in packet.")
+                raise ValueError(f"Field {field} not found in packet {self.header}.")
             self.data[field] = new_value
 
-    def __str__(self) -> str:
+    def is_single_instance(self) -> bool:
+        """Returns whether the packet is a single instance packet.
 
+        :return: whether the packet is a single instance packet
+        :rtype: bool
+        """
+        return self.single_instance
+
+    def __str__(self) -> str:
         return self.header + "; " + str(self.data)

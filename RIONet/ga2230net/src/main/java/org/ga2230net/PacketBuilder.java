@@ -7,6 +7,7 @@ import java.util.Map;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 /**
  * Used to build packets according to their config files
@@ -14,7 +15,7 @@ import java.io.FileNotFoundException;
  */
 public class PacketBuilder {
     // header to fields and types
-    private final Map<String, Map<String, Character>> packetSchemes;
+    private final Map<String, PacketRepresentation> packetSchemes;
 
     /**
      * Creates a new packet builder from a packet directory
@@ -34,7 +35,10 @@ public class PacketBuilder {
         if (!packetSchemes.containsKey(header)) {
             throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
         }
-        return new Packet(header, formatOf(header), fieldsOf(header));
+        return new Packet(header,
+                packetSchemes.get(header).fmt(),
+                packetSchemes.get(header).singleInstance(),
+                packetSchemes.get(header).fields());
     }
 
     /**
@@ -50,8 +54,9 @@ public class PacketBuilder {
         }
         Packet new_packet = buildFromHeader(header);
         Object[] body = StructUtils.unpack(formatOf(header), raw_body);
+        String[] fields = fieldsOf(header);
         for (int i = 0; i < body.length; i++) {
-            new_packet.setField(fieldsOf(header)[i], body[i]);
+            new_packet.setField(fields[i], body[i]);
         }
         return new_packet;
     }
@@ -66,7 +71,8 @@ public class PacketBuilder {
         if (!packetSchemes.containsKey(header)) {
             throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
         }
-        return StructUtils.sizeOf(formatOf(header));
+
+        return StructUtils.sizeOf(packetSchemes.get(header).fmt());
     }
 
     /**
@@ -79,12 +85,8 @@ public class PacketBuilder {
         if (!packetSchemes.containsKey(header)) {
             throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
         }
-        Map<String, Character> fields = packetSchemes.get(header);
-        StringBuilder format = new StringBuilder();
-        for (Character type : fields.values()) {
-            format.append(type);
-        }
-        return format.toString();
+
+        return packetSchemes.get(header).fmt();
     }
 
     /**
@@ -97,19 +99,19 @@ public class PacketBuilder {
         if (!packetSchemes.containsKey(header)) {
             throw new IllegalArgumentException("Header " + header + " does not exist in packet directory");
         }
-        return packetSchemes.get(header).keySet().toArray(new String[0]);
+        return packetSchemes.get(header).fields();
     }
 
     /**
-     * Parses a packet directory into a HashMap of headers to fields and types
+     * Parses a packet directory into a Map of headers the packets representation
      * @param packet_directory the packet directory
      * @return the parsed packet directory
      */
-    private Map<String, Map<String, Character>> parsePacketDirectory(String packet_directory) {
+    private Map<String, PacketRepresentation> parsePacketDirectory(String packet_directory) {
         // Create an instance of the SnakeYAML library
         Yaml yaml = new Yaml();
         // Create a new HashMap to store the result
-        Map<String, Map<String, Character>> result = new LinkedHashMap<>();
+        Map<String, PacketRepresentation> result = new LinkedHashMap<>();
 
         try {
             // Create a new File object representing the directory passed as a parameter
@@ -135,13 +137,25 @@ public class PacketBuilder {
 
                     // Iterate through the key-value pairs in the parsed file
                     for (Map.Entry<String, Object> entry : map.entrySet()) {
-                        String key = entry.getKey();
-                        Map<String, Character> innerMap = new LinkedHashMap<>();
+
+                        // create a new packet entry
+                        String header = entry.getKey();
+                        StringBuilder fmt = new StringBuilder();
+                        ArrayList<String> fields = new ArrayList<>();
+                        boolean singleInstance = false;
+
                         for (Map.Entry<String, Object> innerEntry : ((Map<String, Object>) entry.getValue()).entrySet()) {
-                            innerMap.put(innerEntry.getKey(), ((String) innerEntry.getValue()).charAt(0));
+                            String currField = innerEntry.getKey();
+                            if (currField.equals("single_instance")) {
+                                singleInstance = (boolean) innerEntry.getValue();
+                            } else {
+                                fields.add(innerEntry.getKey());
+                                fmt.append(innerEntry.getValue());
+                            }
                         }
+                        String[] tempArr = new String[fields.size()];
                         // Add the key-value pairs to the result map
-                        result.put(key, innerMap);
+                        result.put(header, new PacketRepresentation(header, fields.toArray(tempArr), fmt.toString(), singleInstance));
                     }
                 }
             }
@@ -149,7 +163,6 @@ public class PacketBuilder {
             e.printStackTrace();
         }
         // return the result map
-        System.out.println(result);
         return result;
     }
 }

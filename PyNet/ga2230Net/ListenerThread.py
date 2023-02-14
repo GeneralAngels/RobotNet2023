@@ -1,4 +1,4 @@
-from threading import Thread
+from threading import Thread, Lock
 from queue import Queue
 import socket
 from typing import List
@@ -27,12 +27,13 @@ class ListenerThread(Thread):
 
         self.running = True
 
+        self.mutex = Lock()
+
     def run(self) -> None:
         while self.running:
             try:
                 new_packet: Packet = self.listener_socket.get_packet()
-                with self.packet_queue.mutex:
-                    self.packet_queue.put(new_packet)
+                self._add_to_queue(new_packet)
             except socket.error:
                 self.running = False
 
@@ -46,9 +47,9 @@ class ListenerThread(Thread):
         :rtype: Packet
         """
         if num_of_packets is None:
-            num_of_packets = len(self.packet_queue)
+            num_of_packets = self.packet_queue.qsize()
 
-        with self.packet_queue.mutex:
+        with self.mutex:
             packets: list[Packet] = [
                 self.packet_queue.get() for _ in range(num_of_packets)
             ]
@@ -58,7 +59,7 @@ class ListenerThread(Thread):
     def flush_packets_queue(self) -> None:
         """Flushes the packet queue
         """
-        with self.packet_queue.mutex:
+        with self.mutex:
             self.packet_queue.queue.clear()
 
     def is_running(self) -> bool:
@@ -68,3 +69,18 @@ class ListenerThread(Thread):
         :rtype: bool
         """
         return self.running
+
+    def _add_to_queue(self, packet: Packet) -> None:
+        """Adds a packet to the packet queue
+
+        :param packet: the packet to add
+        :type packet: Packet
+        """
+
+        with self.mutex:
+            if packet.is_single_instance():
+                for packet_in_queue in self.packet_queue.queue:
+                    if packet_in_queue.header == packet.header:
+                        self.packet_queue.queue.remove(packet_in_queue)
+                        break
+            self.packet_queue.put(packet)

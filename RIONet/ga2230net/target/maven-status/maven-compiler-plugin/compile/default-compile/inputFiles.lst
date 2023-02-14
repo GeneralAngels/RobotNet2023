@@ -1,8 +1,9 @@
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\socket_handlers\SocketHandlerException.java
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\packets\Packet.java
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\thread_handlers\ListenerThread.java
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\packets\PacketBuilder.java
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\socket_handlers\ListenerSocket.java
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\socket_utils\StructError.java
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\socket_utils\StructUtils.java
-C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\socket_handlers\SenderSocket.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\Packet.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\StructError.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\StructUtils.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\PacketRepresentation.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\ListenerSocket.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\SocketHandlerException.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\SenderSocket.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\ListenerThread.java
+C:\Users\User\Desktop\RobotNet2023\RIONet\ga2230net\src\main\java\org\ga2230net\PacketBuilder.java

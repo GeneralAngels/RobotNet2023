@@ -12,11 +12,36 @@ public class MappedListenerThread extends Thread {
     private final Map<String, Queue<Packet>> packetTable;
     private final ListenerSocket listenerSocket;
     private boolean running;
+    private static MappedListenerThread listenerThread;
 
-    public MappedListenerThread(int port, PacketBuilder builder) throws IOException {
+    /**
+     * create a new listener thread
+     * @param port the port to listen on
+     * @param builder the packet builder to use to build packets
+     * @throws IOException if an error occurs while creating the listener sockets
+     */
+    private MappedListenerThread(int port, PacketBuilder builder) throws IOException {
         lock = new ReentrantLock();
         packetTable = new LinkedHashMap<>();
         listenerSocket = new ListenerSocket(port, builder);
+    }
+
+    /**
+     * initializes the single ListenerThread instance
+     * @param port the port to listen on
+     * @param builder the builder to use for parsing raw packets
+     * @throws IOException if an IO error occurred
+     */
+    public static void initListener(int port, PacketBuilder builder) throws IOException {
+        listenerThread = new MappedListenerThread(port, builder);
+    }
+
+
+    /**
+     * @return the single ListenerThread instance, null if the listener wasn't initialized
+     */
+    public static MappedListenerThread getInstance() {
+        return listenerThread;
     }
 
     public void run() {
@@ -33,9 +58,9 @@ public class MappedListenerThread extends Thread {
     }
 
     /**
-     * get the next n packets from the received packets queue
+     * get the next n packets from the received packets queue of the given header
      *
-     * @return a Packet array from the threads packet queue, returns null if
+     * @return a Packet array from the header's packet queue, returns null if
      *         the queue is empty
      */
     public Packet[] getPackets(String header, int numOfPackets) {
@@ -53,7 +78,7 @@ public class MappedListenerThread extends Thread {
     }
 
     /**
-     * @return an array of all packets left in the packet queue
+     * @return an array of all packets left in the packet queue of the given header
      */
     public Packet[] getPackets(String header) {
         lock.lock();
@@ -70,7 +95,7 @@ public class MappedListenerThread extends Thread {
     }
 
     /**
-     * flushes the packet queue and thus deleting all packets in it
+     * flushes the packet queue of the given header and thus deleting all packets in it
      */
     public void flushPacketsQueue(String header) {
         lock.lock();
@@ -90,7 +115,7 @@ public class MappedListenerThread extends Thread {
         lock.lock();
         try {
             Queue<Packet> pq = packetTable.get(packet.getHeader());
-            if (!pq) {
+            if (pq == null) {
                 pq = new LinkedList<>();
                 pq.add(packet);
                 packetTable.put(packet.getHeader(), pq);

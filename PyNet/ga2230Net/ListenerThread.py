@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from threading import Thread, Lock
 from queue import Queue
 import socket
-from typing import List
 
 from .ListenerSocket import ListenerSocket
 from .Packet import Packet
@@ -12,22 +13,33 @@ class ListenerThread(Thread):
     """A thread handler for a listener that will continuously listen
     on a specified port and insert all data recieved into a queue
     """
-    def __init__(self, port: int, packet_builder: PacketBuilder) -> None:
+
+    __instance: ListenerThread = None
+
+    def __new__(cls, port: int, packet_builder: PacketBuilder) -> None:
         """
         :param port: the port to listen on
         :type port: int
         :param packet_builder: the packet builder to use
         :type packet_builder: PacketBuilder
         """
-        super().__init__()
-        self.listener_socket: ListenerSocket = ListenerSocket(
-            port, packet_builder
-        )
-        self.packet_queue: "Queue[Packet]" = Queue()
+        if cls.__instance is None:
+            cls.instance = super(ListenerThread, cls).__new__(cls)
+            cls.__instance.listener_socket: ListenerSocket = ListenerSocket(
+                port, packet_builder
+            )
+            cls.__instance.packet_queue: "Queue[Packet]" = Queue()
+            cls.__instance.running = True
+            cls.__instance.mutex = Lock()
+        return cls.instance
 
-        self.running = True
+    def get_instance(cls) -> ListenerThread:
+        """Returns the instance of the listener thread
 
-        self.mutex = Lock()
+        :return: the instance of the listener thread
+        :rtype: ListenerThread
+        """
+        return cls.__instance
 
     def run(self) -> None:
         while self.running:

@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.LinkedHashMap;
 
+/**
+ * A thread that listens for incoming packets from a sender and adds them to a queue
+ */
 public class MappedListenerThread extends Thread {
     private final ReentrantLock lock;
     private final Map<String, Queue<Packet>> packetTable;

@@ -84,17 +84,20 @@ public class MappedListenerThread extends Thread {
      * @return an array of all packets left in the packet queue of the given header
      */
     public Packet[] getPackets(String header) {
+        Packet[] packets = null;
         lock.lock();
         try {
             Queue<Packet> pq = packetTable.get(header);
-            Packet[] packets = new Packet[pq.size()];
-            for(int i = 0; i < packets.length; i++){
-                packets[i] = pq.poll();
+            if (pq != null) {
+                packets = new Packet[pq.size()];
+                for(int i = 0; i < packets.length; i++){
+                    packets[i] = pq.poll();
+                }
             }
-            return packets;
         } finally {
             lock.unlock();
         }
+        return packets;
     }
 
     /**

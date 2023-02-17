@@ -127,7 +127,7 @@ class PacketBuilder:
         # one dictionary.
         for filename in os.listdir(self.packet_directory):
             if filename.endswith(".packet"):
-                conf_yaml = open(self.packet_directory + '\\' + filename, "r")
+                conf_yaml = open(os.path.join(self.packet_directory, filename), "r")
                 yaml_data = yaml.load(conf_yaml, Loader=yaml.FullLoader)
                 conf_yaml.close()
 

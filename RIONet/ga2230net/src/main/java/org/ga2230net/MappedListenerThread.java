@@ -2,19 +2,20 @@ package org.ga2230net;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.LinkedHashMap;
 
 /**
  * A thread that listens for incoming packets from a sender and adds them to a queue
  */
-public class ListenerThread extends Thread {
-    private final Queue<Packet> packetQueue;
-    private final ListenerSocket listenerSocket;
+public class MappedListenerThread extends Thread {
     private final ReentrantLock lock;
+    private final Map<String, Queue<Packet>> packetTable;
+    private final ListenerSocket listenerSocket;
     private boolean running;
-    private static ListenerThread listenerThread = null;
+    private static MappedListenerThread listenerThread;
 
     /**
      * create a new listener thread
@@ -22,9 +23,9 @@ public class ListenerThread extends Thread {
      * @param builder the packet builder to use to build packets
      * @throws IOException if an error occurs while creating the listener sockets
      */
-    private ListenerThread(int port, PacketBuilder builder) throws IOException {
+    private MappedListenerThread(int port, PacketBuilder builder) throws IOException {
         lock = new ReentrantLock();
-        packetQueue = new LinkedList<>();
+        packetTable = new LinkedHashMap<>();
         listenerSocket = new ListenerSocket(port, builder);
     }
 
@@ -34,14 +35,15 @@ public class ListenerThread extends Thread {
      * @param builder the builder to use for parsing raw packets
      * @throws IOException if an IO error occurred
      */
-    public static void initListener(int port, PacketBuilder builder) throws  IOException {
-        listenerThread = new ListenerThread(port, builder);
+    public static void initListener(int port, PacketBuilder builder) throws IOException {
+        listenerThread = new MappedListenerThread(port, builder);
     }
+
 
     /**
      * @return the single ListenerThread instance, null if the listener wasn't initialized
      */
-    public static ListenerThread getInstance() {
+    public static MappedListenerThread getInstance() {
         return listenerThread;
     }
 
@@ -59,17 +61,18 @@ public class ListenerThread extends Thread {
     }
 
     /**
-     * get the next n packets from the received packets queue
+     * get the next n packets from the received packets queue of the given header
      *
-     * @return a Packet array from the threads packet queue, returns null if
+     * @return a Packet array from the header's packet queue, returns null if
      *         the queue is empty
      */
-    public Packet[] getPackets(int numOfPackets) {
+    public Packet[] getPackets(String header, int numOfPackets) {
         lock.lock();
         try {
+            Queue<Packet> pq = packetTable.get(header);
             Packet[] packets = new Packet[numOfPackets];
             for(int i = 0; i < numOfPackets; i++){
-                packets[i] = packetQueue.poll();
+                packets[i] = pq.poll();
             }
             return packets;
         } finally {
@@ -78,28 +81,33 @@ public class ListenerThread extends Thread {
     }
 
     /**
-     * @return an array of all packets left in the packet queue
+     * @return an array of all packets left in the packet queue of the given header
      */
-    public Packet[] getPackets() {
+    public Packet[] getPackets(String header) {
+        Packet[] packets = null;
         lock.lock();
         try {
-            Packet[] packets = new Packet[packetQueue.size()];
-            for(int i = 0; i < packets.length; i++){
-                packets[i] = packetQueue.poll();
+            Queue<Packet> pq = packetTable.get(header);
+            if (pq != null) {
+                packets = new Packet[pq.size()];
+                for(int i = 0; i < packets.length; i++){
+                    packets[i] = pq.poll();
+                }
             }
-            return packets;
         } finally {
             lock.unlock();
         }
+        return packets;
     }
 
     /**
-     * flushes the packet queue and thus deleting all packets in it
+     * flushes the packet queue of the given header and thus deleting all packets in it
      */
-    public void flushPacketsQueue() {
+    public void flushPacketsQueue(String header) {
         lock.lock();
         try {
-            packetQueue.clear();
+            Queue<Packet> pq = packetTable.get(header);
+            pq.clear();
         } finally {
             lock.unlock();
         }
@@ -112,15 +120,22 @@ public class ListenerThread extends Thread {
     private void addPacket(Packet packet) {
         lock.lock();
         try {
-            if (packet.isSingleInstance()) {
-                for (Packet p: packetQueue) {
-                    if (p.getHeader().equals(packet.getHeader())) {
-                        packetQueue.remove(p);
-                        break;
+            Queue<Packet> pq = packetTable.get(packet.getHeader());
+            if (pq == null) {
+                pq = new LinkedList<>();
+                pq.add(packet);
+                packetTable.put(packet.getHeader(), pq);
+            } else {
+                if (packet.isSingleInstance()) {
+                    for (Packet p : pq) {
+                        if (p.getHeader().equals(packet.getHeader())) {
+                            pq.remove(p);
+                            break;
+                        }
                     }
                 }
+                pq.add(packet);
             }
-            packetQueue.add(packet);
         } finally {
             lock.unlock();
         }

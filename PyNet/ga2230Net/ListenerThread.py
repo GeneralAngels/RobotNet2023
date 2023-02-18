@@ -24,14 +24,17 @@ class ListenerThread(Thread):
         :type packet_builder: PacketBuilder
         """
         if cls.__instance is None:
-            cls.instance = super(ListenerThread, cls).__new__(cls)
+            cls.__instance = super(ListenerThread, cls).__new__(cls)
             cls.__instance.listener_socket: ListenerSocket = ListenerSocket(
                 port, packet_builder
             )
             cls.__instance.packet_queue: "Queue[Packet]" = Queue()
             cls.__instance.running = True
             cls.__instance.mutex = Lock()
-        return cls.instance
+        return cls.__instance
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__()
 
     def get_instance(cls) -> ListenerThread:
         """Returns the instance of the listener thread

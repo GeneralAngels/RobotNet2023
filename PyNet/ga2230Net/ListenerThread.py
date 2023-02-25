@@ -71,6 +71,14 @@ class ListenerThread(Thread):
 
         return packets
 
+    def get_packet(self) -> Packet:
+        """Retrieves a packet from the packet queue
+
+        :return: a packet
+        :rtype: Packet
+        """
+        return self.get_packets(1)[0]
+
     def flush_packets_queue(self) -> None:
         """Flushes the packet queue
         """

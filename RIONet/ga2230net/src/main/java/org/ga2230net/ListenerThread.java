@@ -94,6 +94,18 @@ public class ListenerThread extends Thread {
     }
 
     /**
+     * @return the latest packet recieved in the queue
+     */
+    public Packet getPacket() {
+        lock.lock();
+        try {
+            return packetQueue.poll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    /**
      * flushes the packet queue and thus deleting all packets in it
      */
     public void flushPacketsQueue() {

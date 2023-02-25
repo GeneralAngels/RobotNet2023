@@ -61,10 +61,7 @@ public class MappedListenerThread extends Thread {
     }
 
     /**
-     * get the next n packets from the received packets queue of the given header
-     *
-     * @return a Packet array from the header's packet queue, returns null if
-     *         the queue is empty
+     * @return get the next n packets from the received packets queue of the given header
      */
     public Packet[] getPackets(String header, int numOfPackets) {
         lock.lock();
@@ -84,20 +81,33 @@ public class MappedListenerThread extends Thread {
      * @return an array of all packets left in the packet queue of the given header
      */
     public Packet[] getPackets(String header) {
-        Packet[] packets = null;
         lock.lock();
         try {
             Queue<Packet> pq = packetTable.get(header);
             if (pq != null) {
-                packets = new Packet[pq.size()];
+                Packet[] packets = new Packet[pq.size()];
                 for(int i = 0; i < packets.length; i++){
                     packets[i] = pq.poll();
                 }
+                return packets;
             }
+            return new Packet[0];
         } finally {
             lock.unlock();
         }
-        return packets;
+    }
+
+    /**
+     * @param header the header of the packet to get
+     * @return the first packet in the packet queue of the given header
+     */
+    public Packet getPacket(String header) {
+        lock.lock();
+        try {
+            return packetTable.get(header).poll();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**

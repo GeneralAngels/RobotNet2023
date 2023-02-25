@@ -3354,8 +3354,8 @@
     },
     {
       "type": "rectangle",
-      "version": 153,
-      "versionNonce": 1060331197,
+      "version": 164,
+      "versionNonce": 1400273747,
       "isDeleted": false,
       "id": "jV4ZxDVnFWYMScvn6yQBl",
       "fillStyle": "hachure",
@@ -3364,7 +3364,7 @@
       "roughness": 1,
       "opacity": 100,
       "angle": 0,
-      "x": 1486.7244739369555,
+      "x": 1471.1682023510486,
       "y": 876.9203324074786,
       "strokeColor": "#000000",
       "backgroundColor": "transparent",
@@ -3385,14 +3385,14 @@
           "type": "arrow"
         }
       ],
-      "updated": 1677067164062,
+      "updated": 1677070346278,
       "link": null,
       "locked": false
     },
     {
       "type": "text",
-      "version": 127,
-      "versionNonce": 121943955,
+      "version": 138,
+      "versionNonce": 566220637,
       "isDeleted": false,
       "id": "IcEXZbAWJhCrefUhrMX96",
       "fillStyle": "hachure",
@@ -3401,7 +3401,7 @@
       "roughness": 1,
       "opacity": 100,
       "angle": 0,
-      "x": 1542.0065751752159,
+      "x": 1526.450303589309,
       "y": 915.7790004626129,
       "strokeColor": "#000000",
       "backgroundColor": "transparent",
@@ -3413,7 +3413,7 @@
         "type": 2
       },
       "boundElements": [],
-      "updated": 1677067164062,
+      "updated": 1677070346278,
       "link": null,
       "locked": false,
       "fontSize": 20,
@@ -3427,8 +3427,8 @@
     },
     {
       "type": "arrow",
-      "version": 303,
-      "versionNonce": 1140164221,
+      "version": 325,
+      "versionNonce": 501670845,
       "isDeleted": false,
       "id": "vOqD_63Aay6W6auLqSLRl",
       "fillStyle": "hachure",
@@ -3438,18 +3438,18 @@
       "opacity": 100,
       "angle": 0,
       "x": 1277.8406587105098,
-      "y": 931.4117624665512,
+      "y": 931.4404988274274,
       "strokeColor": "#000000",
       "backgroundColor": "transparent",
-      "width": 197.98552921463124,
-      "height": 1.8163810019691482,
+      "width": 182.42925762872437,
+      "height": 1.728144529445899,
       "seed": 422495216,
       "groupIds": [],
       "roundness": {
         "type": 2
       },
       "boundElements": [],
-      "updated": 1677067164166,
+      "updated": 1677070346279,
       "link": null,
       "locked": false,
       "startBinding": {
@@ -3471,8 +3471,8 @@
           0
         ],
         [
-          197.98552921463124,
-          1.8163810019691482
+          182.42925762872437,
+          1.728144529445899
         ]
       ]
     },

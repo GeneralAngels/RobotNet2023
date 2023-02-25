@@ -104,7 +104,10 @@ public class MappedListenerThread extends Thread {
     public Packet getPacket(String header) {
         lock.lock();
         try {
-            return packetTable.get(header).poll();
+            Queue<Packet> pq = packetTable.get(header);
+            if (pq != null)
+                return packetTable.get(header).poll();
+            return null;
         } finally {
             lock.unlock();
         }

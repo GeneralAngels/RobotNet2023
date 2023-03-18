@@ -11,7 +11,7 @@ from .Packet import Packet
 from .PacketBuilder import PacketBuilder
 
 
-class MappedListenerThread(Thread):
+class MappedListenerThread(Thread):  # TODO: consider raising an error when recieving/accessing packets not configured in packetBuilder
     """A thread handler for a listener that will continuously listen
       on a specified port and insert all data recieved into a
       map of headers to packet queues
@@ -52,7 +52,8 @@ class MappedListenerThread(Thread):
             try:
                 new_packet: Packet = self.listener_socket.get_packet()
                 self._add_to_queue(new_packet)
-            except socket.error:
+            except Exception as e:
+                print(e)
                 self.running = False
 
     def get_packets(self, header: str,
@@ -71,6 +72,9 @@ class MappedListenerThread(Thread):
         if num_of_packets is None:
             num_of_packets = self.packet_map[header].qsize()
 
+        if header not in self.packet_map.keys():
+            return []
+
         with self.mutex:
             packets: List[Packet] = [
                 self.packet_map[header].get(False)
@@ -86,12 +90,16 @@ class MappedListenerThread(Thread):
         :return: a packet
         :rtype: Packet
         """
-        return self.get_packets(header, 1)[0]
+        return next(iter(self.get_packets(header, 1)), None)
 
     def flush_packets(self, header: str = None) -> None:
         """Flushes the packet queue of the specified packet header
         if a header wasnt specified, it will flush all packet queues in the map
         """
+
+        if header not in self.packet_map.keys():
+            return
+
         with self.mutex:
             if header is None:
                 for q in self.packet_map.values():
@@ -113,7 +121,8 @@ class MappedListenerThread(Thread):
         :param packet: the packet to add
         :type packet: Packet
         """
-
+        if packet.header not in self.packet_map.keys():
+            self.packet_map[packet.header] = Queue()
         with self.mutex:
             if packet.is_single_instance():
                 self.packet_map[packet.header].get()

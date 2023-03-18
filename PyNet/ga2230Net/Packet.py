@@ -56,7 +56,8 @@ class Packet:
         :raises ValueError: if the field is not found in the packet
         """
         if field not in self.data:
-            raise ValueError(f"Field {field} not found in packet {self.header}.")
+            raise ValueError(f"Field {field} not found \
+                               in packet {self.header}.")
 
         return self.data[field]
 
@@ -67,7 +68,8 @@ class Packet:
         """
         for field, new_value in fields.items():
             if field not in self.data:
-                raise ValueError(f"Field {field} not found in packet {self.header}.")
+                raise ValueError(f"Field {field} not found in\
+                                   packet {self.header}.")
             self.data[field] = new_value
 
     def is_single_instance(self) -> bool:

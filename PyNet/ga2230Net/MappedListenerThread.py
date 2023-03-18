@@ -4,17 +4,20 @@ from threading import Thread, Lock
 from queue import Queue
 import socket
 
+from typing import List, Dict
+
 from .ListenerSocket import ListenerSocket
 from .Packet import Packet
 from .PacketBuilder import PacketBuilder
 
 
-class ListenerThread(Thread):
+class MappedListenerThread(Thread):
     """A thread handler for a listener that will continuously listen
-    on a specified port and insert all data recieved into a queue
+      on a specified port and insert all data recieved into a
+      map of headers to packet queues
     """
 
-    __instance: ListenerThread = None
+    __instance: MappedListenerThread = None
 
     def __new__(cls, port: int, packet_builder: PacketBuilder) -> None:
         """
@@ -24,11 +27,11 @@ class ListenerThread(Thread):
         :type packet_builder: PacketBuilder
         """
         if cls.__instance is None:
-            cls.__instance = super(ListenerThread, cls).__new__(cls)
+            cls.__instance = super(MappedListenerThread, cls).__new__(cls)
             cls.__instance.listener_socket: ListenerSocket = ListenerSocket(
                 port, packet_builder
             )
-            cls.__instance.packet_queue: Queue = Queue()
+            cls.__instance.packet_map: Dict[Queue] = {}
             cls.__instance.running = True
             cls.__instance.mutex = Lock()
         return cls.__instance
@@ -36,11 +39,11 @@ class ListenerThread(Thread):
     def __init__(self, *args, **kwargs) -> None:
         super().__init__()
 
-    def get_instance(cls) -> ListenerThread:
+    def get_instance(cls) -> MappedListenerThread:
         """Returns the instance of the listener thread
 
         :return: the instance of the listener thread
-        :rtype: ListenerThread
+        :rtype: MappedListenerThread
         """
         return cls.__instance
 
@@ -52,38 +55,49 @@ class ListenerThread(Thread):
             except socket.error:
                 self.running = False
 
-    def get_packets(self, num_of_packets: int = None) -> list[Packet]:
-        """Retrieves a list of packets from the packet queue.
+    def get_packets(self, header: str,
+                    num_of_packets: int = None) -> List[Packet]:
+        """Retrieves a list of packets from the packet map according
+          to the given header.
         Returns all packets if a number wasnt specified.
 
+        :param header: the header of the packets
+        :type header: str
         :param num_of_packets: the number of packets to retrieve
         :type num_of_packets: int
-        :return: a packet
-        :rtype: Packet
+        :return: a list of packets of a specified header
+        :rtype: List[Packet]
         """
         if num_of_packets is None:
-            num_of_packets = self.packet_queue.qsize()
+            num_of_packets = self.packet_map[header].qsize()
 
         with self.mutex:
-            packets: list[Packet] = [
-                self.packet_queue.get(False) for _ in range(num_of_packets)
+            packets: List[Packet] = [
+                self.packet_map[header].get(False)
+                for _ in range(num_of_packets)
             ]
 
         return packets
 
-    def get_packet(self) -> Packet:
-        """Retrieves a packet from the packet queue
+    def get_packet(self, header: str) -> Packet:
+        """Retrieves a single packet from the packet queue of the
+          specified header
 
         :return: a packet
         :rtype: Packet
         """
-        return self.get_packets(1)[0]
+        return self.get_packets(header, 1)[0]
 
-    def flush_packets_queue(self) -> None:
-        """Flushes the packet queue
+    def flush_packets(self, header: str = None) -> None:
+        """Flushes the packet queue of the specified packet header
+        if a header wasnt specified, it will flush all packet queues in the map
         """
         with self.mutex:
-            self.packet_queue.queue.clear()
+            if header is None:
+                for q in self.packet_map.values():
+                    q.queue.clear()
+            else:
+                self.packet_map[header].queue.clear()
 
     def is_running(self) -> bool:
         """Returns whether the thread is running
@@ -102,8 +116,5 @@ class ListenerThread(Thread):
 
         with self.mutex:
             if packet.is_single_instance():
-                for packet_in_queue in self.packet_queue.queue:
-                    if packet_in_queue.header == packet.header:
-                        self.packet_queue.queue.remove(packet_in_queue)
-                        break
-            self.packet_queue.put(packet)
+                self.packet_map[packet.header].get()
+            self.packet_map[packet.header].put(packet)

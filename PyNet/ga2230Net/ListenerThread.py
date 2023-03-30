@@ -11,7 +11,7 @@ from .PacketBuilder import PacketBuilder
 
 class ListenerThread(Thread):
     """A thread handler for a listener that will continuously listen
-    on a specified port and insert all data recieved into a queue
+    on a specified port and insert all data received into a queue
     """
 
     __instance: ListenerThread = None

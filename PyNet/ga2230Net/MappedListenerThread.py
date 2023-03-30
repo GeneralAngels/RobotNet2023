@@ -11,7 +11,6 @@ from .Packet import Packet
 from .PacketBuilder import PacketBuilder
 
 
-# TODO: consider raising an error when recieving/accessing packets not configured in packetBuilder
 class MappedListenerThread(Thread):
     """A thread handler for a listener that will continuously listen
       on a specified port and insert all data received into a
@@ -33,6 +32,7 @@ class MappedListenerThread(Thread):
                 port, packet_builder
             )
             cls.__instance.packet_map: Dict[Queue] = {}
+            cls.__instance.builder: PacketBuilder = packet_builder
             cls.__instance.running = True
             cls.__instance.mutex = Lock()
         return cls.__instance
@@ -69,7 +69,12 @@ class MappedListenerThread(Thread):
         :type num_of_packets: int
         :return: a list of packets of a specified header
         :rtype: List[Packet]
+        :raises ValueError: if the header is not found in the packet schemes
         """
+
+        if header not in self.builder.packet_schemes.keys():
+            raise ValueError(f"Header {header} not found in packet schemes.")
+
         if num_of_packets is None:
             num_of_packets = self.packet_map[header].qsize()
 

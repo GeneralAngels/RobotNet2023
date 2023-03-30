@@ -28,7 +28,7 @@ class ListenerThread(Thread):
             cls.__instance.listener_socket: ListenerSocket = ListenerSocket(
                 port, packet_builder
             )
-            cls.__instance.packet_queue: "Queue[Packet]" = Queue()
+            cls.__instance.packet_queue: Queue = Queue()
             cls.__instance.running = True
             cls.__instance.mutex = Lock()
         return cls.__instance
@@ -66,7 +66,7 @@ class ListenerThread(Thread):
 
         with self.mutex:
             packets: list[Packet] = [
-                self.packet_queue.get() for _ in range(num_of_packets)
+                self.packet_queue.get(False) for _ in range(num_of_packets)
             ]
 
         return packets

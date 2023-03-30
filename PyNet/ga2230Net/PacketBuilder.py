@@ -16,9 +16,10 @@ class Packet_Representation:
 
 
 class PacketBuilder:
-    """A class that builds packets according to their chemes defined
+    """A class that builds packets according to their schemes defined
      in a packet config file in the given directory.
     """
+
     def __init__(self, packet_directory: str) -> None:
         """Creates a new packet builder.
 
@@ -119,15 +120,16 @@ class PacketBuilder:
     def _parse_packet_directory(self) -> dict[str, Packet_Representation]:
         """Returns a dictionary of all packet representations to their header.
 
-        :return: a dictionary of all packet's stractures
+        :return: a dictionary of all packet's structures
         :rtype: dict[str, Packet_Representation]
         """
-        general_dict = {}  # A dictionary of all packet's stractures.
-        # Go over all of the files and connectes thier packet structures into
+        general_dict = {}  # A dictionary of all packet's structures.
+        # Go over all of the files and connects their packet structures into
         # one dictionary.
         for filename in os.listdir(self.packet_directory):
             if filename.endswith(".packet"):
-                conf_yaml = open(os.path.join(self.packet_directory, filename), "r")
+                conf_yaml = open(os.path.join(
+                    self.packet_directory, filename), "r")
                 yaml_data = yaml.load(conf_yaml, Loader=yaml.FullLoader)
                 conf_yaml.close()
 

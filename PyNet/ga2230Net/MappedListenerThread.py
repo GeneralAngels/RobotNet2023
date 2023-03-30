@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from threading import Thread, Lock
-from queue import Queue
+from queue import Queue, Empty
 import socket
 
 from typing import List, Dict
@@ -11,9 +11,10 @@ from .Packet import Packet
 from .PacketBuilder import PacketBuilder
 
 
-class MappedListenerThread(Thread):  # TODO: consider raising an error when recieving/accessing packets not configured in packetBuilder
+# TODO: consider raising an error when recieving/accessing packets not configured in packetBuilder
+class MappedListenerThread(Thread):
     """A thread handler for a listener that will continuously listen
-      on a specified port and insert all data recieved into a
+      on a specified port and insert all data received into a
       map of headers to packet queues
     """
 
@@ -60,7 +61,7 @@ class MappedListenerThread(Thread):  # TODO: consider raising an error when reci
                     num_of_packets: int = None) -> List[Packet]:
         """Retrieves a list of packets from the packet map according
           to the given header.
-        Returns all packets if a number wasnt specified.
+        Returns all packets if a number wasn't specified.
 
         :param header: the header of the packets
         :type header: str
@@ -75,11 +76,13 @@ class MappedListenerThread(Thread):  # TODO: consider raising an error when reci
         if header not in self.packet_map.keys():
             return []
 
+        packets = []
         with self.mutex:
-            packets: List[Packet] = [
-                self.packet_map[header].get(False)
-                for _ in range(num_of_packets)
-            ]
+            for _ in range(num_of_packets):
+                try:
+                    packets.append(self.packet_map[header].get(block=False))
+                except Empty:
+                    break
 
         return packets
 
@@ -94,7 +97,8 @@ class MappedListenerThread(Thread):  # TODO: consider raising an error when reci
 
     def flush_packets(self, header: str = None) -> None:
         """Flushes the packet queue of the specified packet header
-        if a header wasnt specified, it will flush all packet queues in the map
+        if a header wasn't specified, it will flush all packet queues in the
+          map
         """
 
         if header not in self.packet_map.keys():

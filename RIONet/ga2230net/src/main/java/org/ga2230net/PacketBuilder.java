@@ -108,45 +108,35 @@ public class PacketBuilder {
      * @return the parsed packet directory
      */
     private Map<String, PacketRepresentation> parsePacketDirectory(String packet_directory) {
-        // Create an instance of the SnakeYAML library
+        // SnakeYAML library
         Yaml yaml = new Yaml();
         // Create a new HashMap to store the result
         Map<String, PacketRepresentation> result = new LinkedHashMap<>();
 
         try {
-            // Create a new File object representing the directory passed as a parameter
             File folder = new File(packet_directory);
-            // Check if the directory exists and if it is a directory
             if(!folder.exists() || !folder.isDirectory()){
                 throw new FileNotFoundException("The directory " + packet_directory + " was not found or it's not a directory.");
             }
-            // Get an array of all the files in the directory
             File[] listOfFiles = folder.listFiles();
-            // Check if the list of files is null
             if (listOfFiles == null) {
-                throw new FileNotFoundException("The directory " + packet_directory + " was not found.");
+                throw new FileNotFoundException("The directory " + packet_directory + " has no files.");
             }
-            // Iterate through the files
             for (File file : listOfFiles) {
-                // Check if the file is a file and has the ".packet" extension
+                // Check if the file is a file and has the ".packet" filetype indicator.
                 if (file.isFile() && file.getName().endsWith(".packet")) {
-                    // Read the file using FileInputStream
                     InputStream inputStream = new FileInputStream(file);
-                    // Parse the file using the load method of the Yaml class
                     Map<String, Object> map = yaml.load(inputStream);
-
-                    // Iterate through the key-value pairs in the parsed file
                     for (Map.Entry<String, Object> entry : map.entrySet()) {
 
-                        // create a new packet entry
                         String header = entry.getKey();
                         StringBuilder fmt = new StringBuilder();
                         ArrayList<String> fields = new ArrayList<>();
                         boolean singleInstance = false;
 
                         for (Map.Entry<String, Object> innerEntry : ((Map<String, Object>) entry.getValue()).entrySet()) {
-                            String currField = innerEntry.getKey();
-                            if (currField.equals("single_instance")) {
+                            String curField = innerEntry.getKey();
+                            if (curField.equals("single_instance")) {
                                 singleInstance = (boolean) innerEntry.getValue();
                             } else {
                                 fields.add(innerEntry.getKey());
@@ -162,7 +152,6 @@ public class PacketBuilder {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        // return the result map
         return result;
     }
 }
